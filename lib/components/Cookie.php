@@ -3,7 +3,7 @@
 ### Cookie component
 class Cookie extends Component
 {
-	private $data = array();
+	private static $data = array();
 	
 	public static function init(){		
 		// Get cookie data
@@ -23,7 +23,7 @@ class Cookie extends Component
 	
 	public static function delete($name){
 		// If cookie exists
-		if(self::->exists($name))
+		if(self::exists($name))
 		{
 			// Delete cookie
 			setcookie($name, '', 0, '/', '.'.WEB_DOMAIN);

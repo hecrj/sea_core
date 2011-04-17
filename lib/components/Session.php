@@ -14,6 +14,11 @@ class Session extends Component
 				
 		// Get session data
 		self::$data = $_SESSION;
+		
+		// If a CSRF token doesn't exist
+		if(!self::exists('csrf_token'))
+			// Generate and save one
+			self::write('csrf_token', md5(uniqid(rand(), TRUE)));
 	}
 
 	public static function destroy($destroy_cookie = false){

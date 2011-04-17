@@ -5,12 +5,10 @@ class Request extends Component
 {
 	private static $params;
 	private static $method;
-	private static $ajax;
 	
 	public static function init(){		
 		self::$params	=	array_merge($_GET, $_POST, $_FILES);
 		self::$method	=	$_SERVER['REQUEST_METHOD'];
-		self::$is_ajax		=	(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
 	}
 	
 	public static function params($key = null)
@@ -33,10 +31,6 @@ class Request extends Component
 	
 	public static function isGet(){
 		return (self::$method == 'GET');
-	}
-	
-	public static function isAjax(){
-		return self::$is_ajax;
 	}
 	
 	public static function redirect($path){

@@ -1,0 +1,22 @@
+html, body, h1, h2, h3, h4, h5 { margin: 0; padding: 0; }
+
+body { font-family: Arial, Helvetica, sans-serif; background-color: #222; }
+h1, h2, h3, h4, h5 { font-family: Helvetica, Arial, sans-serif; }
+
+a, a:link, a:active, a:visited { color: #27B; text-decoration: none; outline: 0; }
+a:hover { text-decoration: underline; }
+
+.wrap { margin: 0 auto; width: 1000px; overflow: hidden; }
+header { background-color: #356AA0; color: #FFF; padding: 10px; }
+header h1 { font-size: 3em; }
+header span { font-style: italic; }
+
+#content { padding: 20px 0; color: #333; background-color: #FFF; min-height: 500px; }
+#left { float: left; width: 700px; }
+#right { float: right; width: 300px; }
+
+.block { background-color: #DDEEF6; padding: 10px; border-radius: 5px; }
+.block p { margin: 0.5em 0 0 0; color: #445566; font: 13px/20px 'Lucida Grande', Arial, sans-serif; }
+.block p a { font-weight: 800; }
+
+footer { font-size: 0.85em; text-align: center; padding: 2em; color: #999; }
