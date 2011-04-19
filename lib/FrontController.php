@@ -1,7 +1,8 @@
 <?php
 
 ### FrontController class
-class FrontController {
+class FrontController
+{
 	
 	static function init()
 	{

@@ -36,7 +36,7 @@ class View
 		else
 		{
 			// Get partial name with preg_split
-			list($path, $partial_name) = preg_split('/[.*\/]?([^\/]+)/', $partial, 0, PREG_SPLIT_DELIM_CAPTURE);
+			list(/* EMPTY */, $path, $partial_name) = preg_split('/(.*\/)?([^\/]+)/', $partial, 0, PREG_SPLIT_DELIM_CAPTURE);
 			// Set file path of partial: _partial_name
 			$file = DIR_VIEWS . $path . '_'.$partial_name . '.html.php';
 		}

@@ -1,7 +1,7 @@
 <?php
 
 ### Cookie component
-class Cookie extends Component
+class Cookie implements Component
 {
 	private static $data = array();
 	

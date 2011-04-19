@@ -1,7 +1,7 @@
 <?php
 
-class Router {
-	
+class Router
+{	
 	static $controller;
 	static $action;
 	static $arguments;

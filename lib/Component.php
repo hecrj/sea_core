@@ -1,26 +1,19 @@
 <?php
 
 # Component class
-abstract class Component
-{
-	private static $components = array('Cookie', 'Session', 'Request');
-	
-	abstract public static function init();
-	
-	public static function load($name)
-	{
-		if(in_array($name, self::$components))
-		{
-			require(DIR . 'lib/components/' . $name. '.php');
-			$name::init();
-			return true;
-		}
-			
-		return false;
-	}
+interface Component
+{	
+	public static function init();	
 }
 
-// Add an autoload for the components
-spl_autoload_register('Component::load');
+// Load Components
+require(DIR . 'lib/components/Request.php');
+require(DIR . 'lib/components/Cookie.php');
+require(DIR . 'lib/components/Session.php');
+
+// Initialize components
+Request::init();
+Cookie::init();
+Session::init();
 
 ?>

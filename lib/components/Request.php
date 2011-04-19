@@ -1,7 +1,7 @@
 <?php
 
 ### Request component
-class Request extends Component
+class Request implements Component
 {
 	private static $params;
 	private static $method;
@@ -18,7 +18,7 @@ class Request extends Component
 		elseif(array_key_exists($key, self::$params))
 			return self::$params[$key];
 		
-		return null;
+		return array();
 	}
 	
 	public static function IP(){
@@ -33,7 +33,10 @@ class Request extends Component
 		return (self::$method == 'GET');
 	}
 	
-	public static function redirect($path){
+	public static function redirect($path, $flash = null){
+		if(!empty($flash))
+			Session::write('flash', $flash);
+		
 		header('Location: ' . $path);
 		exit();
 	}

@@ -18,6 +18,11 @@ abstract class Controller {
 		$this->data[$key] = $value;
 	}
 	
+	public function __get($key)
+	{
+		return $this->data[$key];
+	}
+	
 	protected function configure()
 	{
 		// Default configuration method

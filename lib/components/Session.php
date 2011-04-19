@@ -1,7 +1,7 @@
 <?php
 
 ### Session component
-class Session extends Component
+class Session implements Component
 {
 	private static $data = array();
 	

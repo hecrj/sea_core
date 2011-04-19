@@ -3,3 +3,4 @@
 <p>CSRF Token is: <strong><?=$csrf_token?></strong></p>
 <p>Your IP address is: <strong><?=$ip?></strong></p>
 <p>The content of 'test' cookie is: <strong><?=$cookie?></strong></p>
+<p><a href="/users/">Users controller</a></p>
