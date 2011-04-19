@@ -8,6 +8,10 @@ class User extends Model
 		array('password'),
 		array('email')
 	);
+	
+	static $validates_uniqueness_of = array(
+		array('username')
+	);
 }
 
 ?>

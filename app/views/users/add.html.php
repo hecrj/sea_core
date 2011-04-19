@@ -1,21 +1,21 @@
 <h1>Sign up!</h1>
-<?php
-// Create a new object Form and set action to /signup
-$Form = new Form('signup');
+<?php $Form = new Form; ?>
+<?=
+// Create a new object Form, set action to /signup and relate model
+$Form->open('signup') .
 
-// Set the object and name it to relate next inputs
-$Form->to('user', $user);
+// Set the first related object and relate next inputs to him
+$Form->to('user', $user) .
 
 // Username input
-$Form->input('username');
+$Form->input('Username', 'username') .
 
 // Password input
-$Form->input('password', array('type' => 'password'));
+$Form->input('Password', 'password', array('type' => 'password')) .
 
 // E-Mail input
-$Form->input('email', array('label' => 'E-Mail'));
+$Form->input('E-Mail', 'email') .
 
-// Add button
-$Form->button('Create new user');
+// Close with a simple button
+$Form->close('Create new user');
 ?>
-<?= $Form->render() ?>

@@ -18,12 +18,14 @@ header span { font-style: italic; }
 #right { float: right; width: 300px; overflow: visible; }
 
 /* form */
-form { margin: 10px 0; padding: 5px; }
+form { margin: 10px 0; padding: 0 5px; }
 form div { margin-bottom: 15px; }
 form label { vertical-align: top; cursor: pointer; font-size: 1.2em; display: block; font-family: 'Lucida Grande'; }
 form .error label { color: #B02B2C; }
 form .success label { color: #006E2E; }
-form input, form select { color: #666; width: 664px; padding: 2px 5px; height: 40px; font-size: 1.4em; }
+form input, form select { color: #666; width: 632px; padding: 2px 37px 2px 5px; height: 40px; font-size: 1.4em; border: 3px solid #96A6C5; background-position: 638px 50%; background-repeat: no-repeat; border-radius: 5px; }
+form .error input { background-image: url(/images/icons/error.png); border-color: #B02B2C; }
+form .success input { background-image: url(/images/icons/success.png); border-color: #559B4A; }
 form div.buttons { text-align: center; margin-top: 20px; }
 .errors { margin: 10px 0; padding: 10px; background-color: #B02B2C; color: #FFF; overflow: hidden; border-radius: 5px; font-family: 'Lucida Grande'; }
 

@@ -3,94 +3,87 @@
 # Form helper
 class Form
 {
-	
-	private $action;
-	private $options = array('method' => 'post', 'accept-charset' => 'utf-8');
+	private $posted;
 	private $models = array();
 	private $model_active;
 	private $inputs = array();
 	private $buttons = array();
 	
-	public function __construct($action, Array $options = null)
+	public function __construct()
 	{
-		$this->action = $action;
+		// Set if the form has been posted
+		$this->posted = Request::isPost();
 		
-		if($options)
-			$this->options = array_merge($this->options, $options);
+		// Set models defined as arguments of the constructor
+		if($models = func_get_args())
+			foreach($models as $model)
+				$this->models[] = $model;
+	}
+	
+	private function options_string($options, $custom)
+	{
+		if($custom)
+			$options = array_merge($options, $custom);
+		
+		foreach($options as $option => $value)
+			$options_string .= ' ' . $option . '="' . $value . '"';
+			
+		return $options_string;
+	}
+	
+	// Open form tag --> <form action="/posts/add" method="post" accept-charset="utf-8" ...
+	public function open($action, Array $custom = null)
+	{
+		$options = array('method' => 'post', 'accept-charset' => 'utf-8');
+		$options = $this->options_string($options, $custom);
+		
+		return '                <form action="/' . $action . '"' . $options . '>'."\n";
 	}
 	
 	public function to($reference, $model)
 	{
 		$this->models[$reference] = $model;
 		$this->model_active = $reference;
-	}
-	
-	public function input($name, $options = array())
-	{
-		$this->inputs[$this->model_active][$name] = $options;
-	}
-	
-	public function button($text, $options = array())
-	{
-		$this->buttons[$text] = $options;
-	}
-	
-	// This method is optimized to performance, that's why the presence of duplicated code
-	// You can simplify this function easily, but you will loss some ms when rendering a form
-	// The blank spaces are necessary to tab correctly and return tidy html code
-	public function render()
-	{
-		$errors = '';
-		$inputs = '';
-		// Error handler
-		if(Request::isPost())
+		
+		if($this->posted)
 		{
-			foreach($this->models as $reference => $model)
+			$errors = '                    <div class="errors">
+	            <h3>Some errors have ocurred:</h3>
+	            <ul>'."\n";
+			foreach($model->errors->full_messages() as $error_msg)
 			{
-				$errors = '                <div class="errors">
-                    <h3>Some errors have ocurred:</h3>
-                    <ul>'."\n";
-				foreach($model->errors->full_messages() as $error_msg)
-				{
-					$errors .= '                        <li>' . $error_msg . '</li>'."\n";
-				}
-				
-				$errors .= '                    </ul>
-                </div>'."\n";
-				
-				foreach($this->inputs[$reference] as $attribute => $options)
-				{
-					$inputs .= '                    <div class="' . (($model->errors->on($attribute)) ? 'error' : 'success') . '">
-                        <label for="' . $attribute . '">' . (($options['label']) ? $options['label'] : ucwords($attribute)) . '</label>
-                        <input name="' . $reference . '[' . $attribute . ']" id="' . $attribute . '" type="' . (($options['type']) ? $options['type'] : 'text') . '" value="' . $model->$attribute . '" />
-                    </div>'."\n";
-				}
+				$errors .= '                        <li>' . $error_msg . '</li>'."\n";
 			}
+		
+			$errors .= '                    </ul>
+	            </div>'."\n";
 			
-		}else {
-			// Process inputs without errors
-			foreach($this->models as $reference => $model)
-			{
-				foreach($this->inputs[$reference] as $attribute => $options)
-				{
-					$inputs .= '                    <div>
-                        <label for="' . $attribute . '">' . (($options['label']) ? $options['label'] : ucwords($attribute)) . '</label>
-                        <input name="' . $reference . '[' . $attribute . ']" id="' . $attribute . '" type="' . (($options['type']) ? $options['type'] : 'text') . '" value="' . $model->$attribute . '" />
-                    </div>'."\n";
-				}
-			}
+			return $errors;
 		}
-		
-		$buttons = '                    <div class="buttons">'."\n";
-		
-		foreach($this->buttons as $text => $options)
-			$buttons .= '                        <button type="' . (($options['type']) ? $options['type'] : 'submit') . '" class="button">' . $text . '</button>'."\n";
-		
-		$buttons .= '                    </div>';
-		
-		return $errors . '                <form action="/' . $this->action . '" method="' . $this->options['method'] . '" accept-charset="' . $this->options['accept-charset'] . '">' . "\n" . $inputs . $buttons . "\n" 
-				. '                </form>'."\n";
 	}
+	
+	public function input($label, $name, $custom = null)
+	{
+		$options = array('type' => 'text');
+		
+		$options = $this->options_string($options, $custom);
+		$model = $this->models[$this->model_active];
+		
+		return '                    <div ' . (($this->posted) ? 'class="' . (($model->errors->on($name)) ? 'error' : 'success') . '"' : '' ) . '>
+                        <label for="' . $name . '">' . $label . '</label>
+                        <input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"'. $options . ' value="' . $model->$name . '" />
+                    </div>'."\n";
+	}
+	
+	public function close($submit_text, $options = array())
+	{
+		return '                    <div class="buttons">
+                        <button type="' . (($options['type']) ? $options['type'] : 'submit') . '" class="button">' . $submit_text . '</button>
+                    </div>
+                </form>'."\n";
+	}
+	
+	
 }
 
 ?>
