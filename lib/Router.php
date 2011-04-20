@@ -55,7 +55,7 @@ class Router
 		self::$action 		=	$action;
 								
 		// The arguments must be 5 parameters minimum
-		self::$arguments = array_pad((array)$arguments, 5, 0);
+		self::$arguments = array_pad((array)$route_parts, 5, 0);
 	}
 	
 	# Search for route matches declared in config/routes.php

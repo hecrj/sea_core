@@ -1,8 +1,8 @@
 <h1>Sign up!</h1>
 <?php $Form = new Form; ?>
 <?=
-// Create a new object Form, set action to /signup and relate model
-$Form->open('signup') .
+// Create a new object Form, set action to /signup
+$Form->open('signup', array('data-ajax' => '/users/check')) .
 
 // Set the first related object and relate next inputs to him
 $Form->to('user', $user) .

@@ -47,7 +47,7 @@ class Form
 		
 		if($this->posted)
 		{
-			$errors = '                    <div class="errors">
+			$errors = '                    <div class="message error">
 	            <h3>Some errors have ocurred:</h3>
 	            <ul>'."\n";
 			foreach($model->errors->full_messages() as $error_msg)
@@ -69,7 +69,7 @@ class Form
 		$options = $this->options_string($options, $custom);
 		$model = $this->models[$this->model_active];
 		
-		return '                    <div ' . (($this->posted) ? 'class="' . (($model->errors->on($name)) ? 'error' : 'success') . '"' : '' ) . '>
+		return '                    <div id="field_' . $name .'"' . (($this->posted) ? ' class="' . (($model->errors->on($name)) ? 'error' : 'success') . '"' : '' ) . '>
                         <label for="' . $name . '">' . $label . '</label>
                         <input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"'. $options . ' value="' . $model->$name . '" />
                     </div>'."\n";

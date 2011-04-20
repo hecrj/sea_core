@@ -21,6 +21,15 @@ class UsersController extends Controller
 		$this->blocks = 'users/signup_info';
 	}
 	
+	public function check($attribute)
+	{
+		$attributes = array('username','password','email');
+		
+		$user = new User(Request::params('user'));
+		
+		$user->ajax_check($attribute, $attributes);
+	}
+	
 }
 
 ?>
