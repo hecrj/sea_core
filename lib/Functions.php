@@ -21,4 +21,11 @@ function To404Unless($boolean, $info = 'Unexpected error')
 		throw new Exception($info, 404);
 }
 
+# Throws an Exception with $info message and error code 404 if $boolean is TRUE
+function To404If($boolean, $info = 'Unexpected error')
+{
+	if($boolean)
+		throw new Exception($info, 404);
+}
+
 ?>

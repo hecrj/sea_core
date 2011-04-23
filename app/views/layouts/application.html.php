@@ -42,7 +42,8 @@
         </div>
     </div>
     <footer>
-        HectaMVC is being developed by Héctor Ramón Jiménez, an 18 years old guy who loves coding and web development.
+        <p>HectaMVC is being developed by Héctor Ramón Jiménez, an 18 years old guy who loves coding and the web development.</p>
+        <p>This page has been processed in <?=microtime(true) - $GLOBALS['time']?> seconds.</p>
     </footer>
   </body>
 </html>

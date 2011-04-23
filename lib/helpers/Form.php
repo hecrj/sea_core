@@ -37,7 +37,8 @@ class Form
 		$options = array('method' => 'post', 'accept-charset' => 'utf-8');
 		$options = $this->options_string($options, $custom);
 		
-		return '                <form action="/' . $action . '"' . $options . '>'."\n";
+		return '                <form action="/' . $action . '"' . $options . '>
+                    <input name="csrf_token" type="hidden" value="' . Session::read('csrf_token') . '" />'."\n";
 	}
 	
 	public function to($reference, $model)

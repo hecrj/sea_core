@@ -6,19 +6,24 @@ class FrontController
 	
 	static function init()
 	{
-		// Uncomment to make index.php unaccessible (Recommended for production)
-		# To404Unless(strpos($_SERVER['REQUEST_URI'], 'index.php') === FALSE);
-		
-		// Analyze route and set request data
-		Router::analyze($_SERVER['PATH_INFO']);
-		
-		// Getting controller name
-		$controller			=	ucwords(Router::$controller) . 'Controller';
-		// Setting controller path
-		$controller_file	=	DIR_CONTROLLERS . $controller . '.php';
-		
 		try
 		{
+		
+			// Initialize Router
+			Router::init();
+			
+			// Uncomment to make index.php unaccessible (Recommended for production)
+			# To404Unless(strpos($_SERVER['REQUEST_URI'], 'index.php') === FALSE);
+		
+			// Initialize components
+			Request::init();
+			Cookie::init();
+			Session::init();
+			Security::init();
+		
+			// Setting controller path
+			$controller_file	=	DIR_CONTROLLERS . Router::$controller_name . '.php';
+		
 			// 404 if controller file doesn't exist
 			To404Unless(is_file($controller_file), 'Controller: <strong>'. $controller_file .'</strong> not found!');
 
@@ -26,7 +31,7 @@ class FrontController
 			require_once($controller_file);
 				
 			// Instance the controller
-			$Controller = new $controller();
+			$Controller = new Router::$controller_name;
 			
 			// Initialize the controller
 			$Controller->init(Router::$action);

@@ -1,17 +1,48 @@
 <?php
 
-class Router
+class Router implements Component
 {	
 	static $controller;
+	static $controller_name;
 	static $action;
 	static $arguments;
+	static $hostname;
+	static $subdomain;
 	static $route;
 	static $routes = array();
 	
-	# Analyze route and extract request info
-	public static function analyze($route){
+	public static function init()
+	{
 		// Require routes to match
 		require(DIR_CONFIG . 'routes.php');
+		
+		// Analyze server host and path info
+		self::analyze($_SERVER['HTTP_HOST'], $_SERVER['PATH_INFO']);
+		
+		// Set controller name
+		self::$controller_name = ucwords(self::$controller) . 'Controller';
+		
+		// Execute after filter function
+		$afterFilter();
+	}
+	
+	# Analyze route and extract request info
+	private static function analyze($host, $route){
+		// Explode host
+		$host_parts = explode('.', $host);
+		
+		// If host has 3 or more parts has a subdomain
+		if(count($host_parts) > 2)
+		{
+			// Set subdomain
+			self::$subdomain = $host_parts[0];
+			
+			// Set hostname
+			self::$hostname  = $host_parts[1];
+		}
+		else
+			// Set hostname
+			self::$hostname  = $host_parts[0];
 		
 		// Set the route
 		self::$route = $route;
@@ -59,7 +90,7 @@ class Router
 	}
 	
 	# Search for route matches declared in config/routes.php
-	public function route_matches($route)
+	private static function route_matches($route)
 	{	
 		// For each route match
 		foreach(self::$routes as $preg => $destination)

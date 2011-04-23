@@ -7,13 +7,10 @@ interface Component
 }
 
 // Load Components
+require(DIR . 'lib/components/Router.php');
 require(DIR . 'lib/components/Request.php');
 require(DIR . 'lib/components/Cookie.php');
 require(DIR . 'lib/components/Session.php');
-
-// Initialize components
-Request::init();
-Cookie::init();
-Session::init();
+require(DIR . 'lib/components/Security.php');
 
 ?>

@@ -18,4 +18,12 @@ self::$routes = array(
 
 );
 
+$afterFilter = function()
+{
+	// Function executed after match a route
+	if(strlen(Router::$subdomain) > 3)
+		Router::$controller_name = 'Blog' . Router::$controller_name;
+	
+}
+
 ?>
