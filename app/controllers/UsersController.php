@@ -6,27 +6,39 @@ class UsersController extends Controller
 	
 	public function index()
 	{
+		// Retrieve all users in table users
 		$this->users = User::all();
 	}
 	
 	public function add()
 	{
+		// Set new User with params of request
 		$user = new User(Request::params('user'));
 		
+		// If http header is post
 		if(Request::isPost())
+			// If user saves
 			if($user->save())
+				// Redirect to controller homepage and set flash message
 				Request::redirect('/users', 'User created successfully!');
 		
+		// Set user to use in view
 		$this->user = $user;
+		
+		// Set blocks partial for the form
 		$this->blocks = 'users/signup_info';
 	}
 	
+	// Function to check if user attributes are valid in AJAX request
 	public function check($attribute)
 	{
-		$attributes = array('username','password','email');
+		// Array of attributes allowed to be checked
+		$attributes = array('username','password','confirm_password','email');
 		
+		// Set new User with params of request
 		$user = new User(Request::params('user'));
 		
+		// Check if the attribute is valid and return a message
 		$user->ajax_check($attribute, $attributes);
 	}
 	

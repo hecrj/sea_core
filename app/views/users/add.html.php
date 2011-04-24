@@ -13,6 +13,9 @@ $Form->input('Username', 'username') .
 // Password input
 $Form->input('Password', 'password', array('type' => 'password')) .
 
+// Confirm password input
+$Form->input('Confirm password', 'confirm_password', array('type' => 'password')) .
+
 // E-Mail input
 $Form->input('E-Mail', 'email') .
 
