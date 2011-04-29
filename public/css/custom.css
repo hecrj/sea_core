@@ -13,17 +13,22 @@ header { background-color: #356AA0; color: #FFF; padding: 10px; height: 70px; }
 header h1 { font-size: 3em; }
 header span { font-style: italic; }
 
-#content { padding: 20px 0; color: #333; background-color: #FFF; min-height: 500px; }
+div#content { padding: 20px 0; color: #333; background-color: #FFF; min-height: 500px; }
 #left { float: left; width: 690px; padding-right: 10px; }
 #right { float: right; width: 300px; overflow: visible; }
 
 /* form */
-form { margin: 10px 0; padding: 0 5px; }
+form { margin: 10px 0; padding: 0 5px; overflow: hidden; }
 form div { margin-bottom: 15px; }
 form label { vertical-align: top; cursor: pointer; font-size: 1.2em; display: block; font-family: 'Lucida Grande'; }
 form .error label { color: #B02B2C; }
 form .success label { color: #006E2E; }
-form input, form select { color: #666; width: 632px; padding: 2px 37px 2px 5px; height: 40px; font-size: 1.4em; border: 3px solid #555; background-position: 638px 50%; background-repeat: no-repeat; border-radius: 5px; }
+form input, form select, form textarea { color: #333; border: 3px solid #555; }
+form input, form select { font-size: 1.4em; }
+form input, form textarea { border-radius: 5px; }
+form input { width: 632px; padding: 2px 37px 2px 5px; height: 40px; background-position: 638px 50%; background-repeat: no-repeat; }
+form select { width: 680px; padding: 5px 2px; }
+form textarea { font: 1em Helvetica, Arial, sans-serif; line-height: 1.5em; padding: 5px; width: 664px; resize: vertical; }
 form .loading input { background-image: url(/images/icons/loading.gif); border-color: #96A6C5; }
 form .error input { background-image: url(/images/icons/error.png); border-color: #B02B2C; }
 form .success input { background-image: url(/images/icons/success.png); border-color: #006E2E; }
@@ -32,6 +37,10 @@ form div.buttons { text-align: center; margin-top: 20px; }
 .block .message { margin-bottom: 0; }
 .message.error { background-color: #B02B2C; }
 .message.success { background-color: #006E2E; }
+/* pagination */
+.pagination { text-align: center; font-family: Verdana; }
+.pagination a { display: inline-block; margin: 5px; padding: 5px; background-color: #e4eeff; border: 1px solid #99B9D0; line-height: 20px; }
+.pagination a.active, .pagination a:hover { background-color: #C3D9FF; }
 
 .button { color: #FFFFFF; font-size: 1.2em; -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3); box-shadow:0 1px 4px rgba(0,0,0,0.3); -webkit-font-smoothing:antialiased;
 	background:#286da3;filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#50b7d1',endColorstr='#286da3'); background:-webkit-gradient(linear,0% 0,0% 100%,from(#50B7D1),to(#286DA3));

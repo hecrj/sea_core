@@ -1,3 +1,23 @@
+Links = {
+	init : function()
+	{
+		$('.ajax-container').each(function(c, container){
+			var $container = $(container);
+			$('.ajax-links a, a.ajax-link', $container).live('click', function(){
+				HectaMVC.Ajax(Links, { type: 'GET', url: $(this).attr('href'), container: $container })
+				return false;
+			});
+		});
+	},
+	Ajax_Load : function(options)
+	{
+		options.container.hide(200);
+	},
+	Ajax_Response : function(response, options)
+	{
+		options.container.queue(function(){ options.container.html(response).show(200); options.container.dequeue(); });
+	}
+}
 Forms = {
 	blocks : null,
 	hidden : null,
@@ -65,6 +85,7 @@ var HectaMVC = {
 	
 	init : function(){
 		Forms.init();
+		Links.init();
 	},
 	Ajax : function( object, optionsCustom ){
 		if(! this.Ajax) return false;

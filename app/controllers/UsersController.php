@@ -6,8 +6,8 @@ class UsersController extends Controller
 	
 	public function index()
 	{
-		// Retrieve all users in table users
-		$this->users = User::all();
+		// Make a pagination with one user per page
+		list($this->user_pages, $this->users) = Pagination::make('User', array('limit' => 1));
 	}
 	
 	public function add()

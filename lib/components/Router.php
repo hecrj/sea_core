@@ -44,14 +44,19 @@ class Router implements Component
 			// Set hostname
 			self::$hostname  = $host_parts[0];
 		
+		// Get pagination page
+		if(strpos($route, '/page-') !== FALSE)
+		{
+			// Split route and set pagination page to use in Request component
+			list(/* EMPTY */, $route, $_GET['page']) = preg_split('/^(.*)page-([0-9]+)?$/', $route, 0, PREG_SPLIT_DELIM_CAPTURE);
+		}
+		
 		// Set the route
-		self::$route = $route;
+		self::$route = $route . ((substr($route, -1) != '/') ? '/' : '');
 			
 		// Remove / at the beginning
 		if(strpos($route, '/') === 0)
 			$route = substr($route, 1);
-		
-		#list($route, $page) = preg_split('/\/pagina-([0-9]+)/', $route, 0, PREG_SPLIT_DELIM_CAPTURE);
 		
 		// If one route has matched...
 		if(self::route_matches($route))

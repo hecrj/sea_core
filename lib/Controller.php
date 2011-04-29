@@ -38,9 +38,12 @@ abstract class Controller {
 		
 		// New View for controller
 		$this->view = new View($this->data);
-				
-		// Load layout associated to controller
-		$this->view->load($this->layout);
+		
+		if(!Request::isAjax())
+			// Load layout associated to controller
+			$this->view->load($this->layout);
+		else
+			$this->view->render();
 	}
 					    
 	private function call($action)

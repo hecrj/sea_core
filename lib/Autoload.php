@@ -3,7 +3,7 @@
 # Autoload class
 class Autoload
 {
-	private static $helpers = array('Form');
+	private static $helpers = array('Form','Pagination');
 	private static $components = array();
 	
 	public static function helper($name)

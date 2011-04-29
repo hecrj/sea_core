@@ -6,6 +6,7 @@ class Form
 	private $posted;
 	private $models = array();
 	private $model_active;
+	private $model;
 	private $inputs = array();
 	private $buttons = array();
 	
@@ -45,6 +46,7 @@ class Form
 	{
 		$this->models[$reference] = $model;
 		$this->model_active = $reference;
+		$this->model = $model;
 		
 		if($this->posted)
 		{
@@ -63,17 +65,41 @@ class Form
 		}
 	}
 	
-	public function input($label, $name, $custom = null)
+	public function label($label, $name, $content)
+	{	
+		return '                    <div id="field_' . $name .'"' . (($this->posted) ? ' class="' . (($this->model->errors->on($name)) ? 'error' : 'success') . '"' : '' ) . '>
+                        <label for="' . $name . '">' . $label . '</label>
+                        ' . $content . '
+                    </div>'."\n";
+	}
+	
+	public function input($label, $name, Array $custom = null)
 	{
 		$options = array('type' => 'text');
 		
 		$options = $this->options_string($options, $custom);
-		$model = $this->models[$this->model_active];
 		
-		return '                    <div id="field_' . $name .'"' . (($this->posted) ? ' class="' . (($model->errors->on($name)) ? 'error' : 'success') . '"' : '' ) . '>
-                        <label for="' . $name . '">' . $label . '</label>
-                        <input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"'. $options . ' value="' . $model->$name . '" />
-                    </div>'."\n";
+		return $this->label($label, $name, '<input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . ' value="' . $this->model->$name . '" />');
+	}
+	
+	public function textarea($label, $name, Array $custom = null)
+	{
+		$options = array('cols' => 60, 'rows' => 10);
+		
+		$options = $this->options_string($options, $custom);
+		
+		return $this->label($label, $name, '<textarea name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . '>'. $this->model->$name . '</textarea>');
+	}
+	
+	public function select($label, $name, Array $selects, Array $custom = null)
+	{
+		$options = array();
+		$options = $this->options_string($options, $custom);
+		
+		foreach($selects as $value => $option)
+			$select_options .= '                            <option value="' . $value . '"' . (($this->model->$name == $value) ? ' selected="selected"' : '') . '>' . $option . '</option>'."\n";
+			
+		return $this->label($label, $name, '<select name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"'. $options . '>' . "\n" . $select_options . '                        </select>');
 	}
 	
 	public function close($submit_text, $options = array())
