@@ -10,6 +10,8 @@ class Security implements Component
 			// Generate and save one
 			Session::write('csrf_token', md5(uniqid(rand(), TRUE)));
 			
-		To404If((Request::isPost() and Session::read('csrf_token') != Request::params('csrf_token')), 'Cross Site Request Forgery detected!');
+		ExceptionIf((Request::isPost() and Session::read('csrf_token') != Request::params('csrf_token')), 'Cross Site Request Forgery detected!');
 	}
 }
+
+?>

@@ -16,16 +16,17 @@ class FrontController
 			# To404Unless(strpos($_SERVER['REQUEST_URI'], 'index.php') === FALSE);
 		
 			// Initialize components
-			Request::init();
-			Cookie::init();
-			Session::init();
-			Security::init();
+			Request::init(); // Request component
+			Cookie::init(); // Cookie component
+			Session::init(); // Session component
+			Security::init(); // Security component
+			Auth::init(); // Auth component
 		
 			// Setting controller path
 			$controller_file	=	DIR_CONTROLLERS . Router::$controller_name . '.php';
 		
-			// 404 if controller file doesn't exist
-			To404Unless(is_file($controller_file), 'Controller: <strong>'. $controller_file .'</strong> not found!');
+			// Exception if controller file doesn't exist
+			ExceptionUnless(is_file($controller_file), 'Controller: <strong>'. $controller_file .'</strong> not found!');
 
 			// Require the controller
 			require_once($controller_file);
@@ -38,9 +39,15 @@ class FrontController
 		}
 		catch (Exception $e)
 		{
-			// If Exception is caught --> Show errors
-			echo '<p>Some errors have ocurred during your request:</p>';
-			echo '<p>'. $e->getMessage() .'</p>';
+			// Clean output buffering
+			ob_clean();
+			
+			// Require error page
+			if(! @include(DIR .'public/'. $e->getCode() .'.php'))
+				echo 'The requested '. $e->getCode() .' error page does not exist!';
+			
+			// End and flush output buffering
+			ob_end_flush();
 		}
 		
  	}

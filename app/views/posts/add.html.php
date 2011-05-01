@@ -4,7 +4,7 @@
 
 $Form->open('posts/add') .
 
-$Form->to('post', $post) .
+$Form->to('post') .
 
 $Form->input('Title', 'title') .
 

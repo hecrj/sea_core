@@ -4,7 +4,17 @@
 class UsersController extends Controller
 {
 	
+	protected $access_filter = array(
+		'add'	=>	array('guest'),
+		'show'	=>	'staff'
+	);
+	
 	public function index()
+	{
+		$this->user = Auth::$user;	
+	}
+	
+	public function show()
 	{
 		// Make a pagination with one user per page
 		list($this->user_pages, $this->users) = Pagination::make('User', array('limit' => 1));
@@ -27,6 +37,27 @@ class UsersController extends Controller
 		
 		// Set blocks partial for the form
 		$this->blocks = 'users/signup_info';
+	}
+	
+	public function login()
+	{
+		$user_params = Request::params('user');
+		$user_data = array('username' => $user_params['username'], 'password' => md5($user_params['password']));
+		
+		if(User::login($user_data['username'], $user_data['password'])->isLogged())
+		{
+			Session::write('user_data', $user_data);
+			Request::redirect('/users');
+		}
+		else
+			Request::redirect('/users', 'Incorrect username or password! Please, try again.');
+	}
+	
+	public function logout()
+	{
+		Session::destroy();
+		
+		Request::redirect('/users');
 	}
 	
 	// Function to check if user attributes are valid in AJAX request

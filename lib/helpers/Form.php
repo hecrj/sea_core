@@ -42,13 +42,13 @@ class Form
                     <input name="csrf_token" type="hidden" value="' . Session::read('csrf_token') . '" />'."\n";
 	}
 	
-	public function to($reference, $model)
+	public function to($reference, $model = false)
 	{
 		$this->models[$reference] = $model;
-		$this->model_active = $reference;
 		$this->model = $model;
+		$this->model_active = $reference;
 		
-		if($this->posted)
+		if($this->posted and $model)
 		{
 			$errors = '                    <div class="message error">
 	            <h3>Some errors have ocurred:</h3>
@@ -67,7 +67,7 @@ class Form
 	
 	public function label($label, $name, $content)
 	{	
-		return '                    <div id="field_' . $name .'"' . (($this->posted) ? ' class="' . (($this->model->errors->on($name)) ? 'error' : 'success') . '"' : '' ) . '>
+		return '                    <div id="field_' . $name .'"' . (($this->posted and $this->model) ? ' class="' . (($this->model->errors->on($name)) ? 'error' : 'success') . '"' : '' ) . '>
                         <label for="' . $name . '">' . $label . '</label>
                         ' . $content . '
                     </div>'."\n";
