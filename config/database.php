@@ -15,9 +15,9 @@ $db = array(
 			// Name of your database
 			'name'		=>	'hectamvc',
 			// User of your database
-			'user'		=>	'hector0193',
+			'user'		=>	'root',
 			// User password
-			'password'	=>	'255601'
+			'password'	=>	''
 		)
 		
 	),
