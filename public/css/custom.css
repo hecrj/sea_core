@@ -23,12 +23,14 @@ form div { margin-bottom: 15px; }
 form label { vertical-align: top; cursor: pointer; font-size: 1.2em; display: block; font-family: 'Lucida Grande'; }
 form .error label { color: #B02B2C; }
 form .success label { color: #006E2E; }
-form input, form select, form textarea { color: #333; border: 3px solid #555; }
-form input, form select { font-size: 1.4em; }
-form input, form textarea { border-radius: 5px; }
+form input, form select, form textarea { color: #333; border: 1px solid #CCC; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; outline: 0 none; -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset, 0 1px 0 rgba(255, 255, 255, 0.2);
+-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset, 0 1px 0 rgba(255, 255, 255, 0.2); -moz-transition: border 0.2s linear, -moz-box-shadow 0.2s linear; -webkit-transition: border 0.2s linear, -webkit-box-shadow 0.2s linear;}
+form input:focus, form textarea:focus { border-color: rgba(82, 168, 236, 0.75) !important; box-shadow: 0 0 8px rgba(82, 168, 236, 0.5); color: #000; }
+form input, form select { font-size: 22px; }
+form input, form textarea { border-radius: 4px; }
 form input { width: 632px; padding: 2px 37px 2px 5px; height: 40px; background-position: 638px 50%; background-repeat: no-repeat; }
 form select { width: 680px; padding: 5px 2px; }
-form textarea { font: 1em Helvetica, Arial, sans-serif; line-height: 1.5em; padding: 5px; width: 664px; resize: vertical; }
+form textarea { font-size: 1em; line-height: 1.5em; padding: 5px; width: 664px; resize: vertical; }
 form .loading input { background-image: url(/images/icons/loading.gif); border-color: #96A6C5; }
 form .error input { background-image: url(/images/icons/error.png); border-color: #B02B2C; }
 form .success input { background-image: url(/images/icons/success.png); border-color: #006E2E; }

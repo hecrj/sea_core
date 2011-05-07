@@ -11,7 +11,7 @@ class UsersController extends Controller
 	
 	public function index()
 	{
-		$this->user = Auth::$user;	
+		$this->user = Auth::$user;
 	}
 	
 	public function show()
