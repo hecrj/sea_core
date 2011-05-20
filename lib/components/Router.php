@@ -7,7 +7,7 @@ class Router implements Component
 	static $action;
 	static $arguments;
 	static $hostname;
-	static $subdomain;
+	static $subdomain = 'www';
 	static $route;
 	static $routes = array();
 	
@@ -21,9 +21,6 @@ class Router implements Component
 		
 		// Set controller name
 		self::$controller_name = ucwords(self::$controller) . 'Controller';
-		
-		// Execute after filter function
-		$afterFilter();
 	}
 	
 	# Analyze route and extract request info
@@ -51,17 +48,28 @@ class Router implements Component
 			list(/* EMPTY */, $route, $_GET['page']) = preg_split('/^(.*)page-([0-9]+)?$/', $route, 0, PREG_SPLIT_DELIM_CAPTURE);
 		}
 		
-		// Set the route
-		self::$route = $route . ((substr($route, -1) != '/') ? '/' : '');
+		// If route doesn't have / at the end
+		if(substr($route, -1) != '/')
+			self::$route = $route . '/';
+		else
+		{
+			self::$route = $route;
+			$route = substr($route, 0, strlen($route) - 1);
+		}
 			
 		// Remove / at the beginning
 		if(strpos($route, '/') === 0)
 			$route = substr($route, 1);
 		
-		// If one route has matched...
-		if(self::route_matches($route))
-			// Return true and stop analyzing
-			return true;
+		// Get subdomain info
+		$sub_info = self::$routes[self::$subdomain];
+		
+		// If isset subdomain matches
+		if(isset($sub_info['match']))
+			// If one route has matched...
+			if(self::route_matches($route, $sub_info['match']))
+				// Return true and stop analyzing
+				return true;
 		
 		// Explode /  route
 		$route_parts = explode('/', $route, 8);
@@ -72,13 +80,18 @@ class Router implements Component
 		// Action is the second part of the route
 		$action = array_shift($route_parts);
 		
-		// If controller isn't defined, it will be 'PagesController'
+		// If controller isn't defined
 		if(empty($controller))
-			$controller = 'pages';
+			$controller = $sub_info['default'];
 		// If controller is defined, convert string to lower
 		else
+		{
 			$controller = strtolower($controller);
-
+			
+			if(isset($sub_info['exclude']))
+				ExceptionIf(in_array($controller, $sub_info['exclude']), 'The <strong>'. $controller .'</strong> controller is an excluded controller for this subdomain.<br />Check your <strong>routes.php</strong> configuration file.');
+		}
+			
 		// If action isn't defined, it will be 'index()'
 		if(empty($action))
 			$action = 'index';
@@ -95,10 +108,10 @@ class Router implements Component
 	}
 	
 	# Search for route matches declared in config/routes.php
-	private static function route_matches($route)
+	private static function route_matches($route, $match)
 	{	
 		// For each route match
-		foreach(self::$routes as $preg => $destination)
+		foreach($match as $preg => $destination)
 		{
 			// If regular expression matches
 			if(preg_match('/'.$preg.'/', $route, $matches))

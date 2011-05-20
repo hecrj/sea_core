@@ -9,4 +9,6 @@ define('DIR_CONTROLLERS', DIR . 'app/controllers/');
 define('DIR_VIEWS', DIR . 'app/views/');
 # Config directory
 define('DIR_CONFIG', DIR . 'config/');
+# Cache directory
+define('DIR_CACHE', DIR . 'cache/');
 ?>

@@ -23,7 +23,6 @@ p {
 
 <body>
 <h1>Ups! The requested page has not been found!</h1>
-
 	<p>The page you are trying to access seems to be unavailable...</p>
 	<p>You have requested the following page:</p>
 	<p><strong>http://<?= $_SERVER['HTTP_HOST'] . $_SERVER['PATH_INFO'] ?></strong></p>

@@ -3,30 +3,28 @@
 # Autoload class
 class Autoload
 {
-	private static $helpers = array('Form','Pagination');
+	private static $helpers = array('Form','Pagination','Cache');
 	private static $components = array();
 	
 	public static function helper($name)
 	{
-		if(in_array($name, self::$helpers))
-		{
-			require(DIR . 'lib/helpers/' . $name. '.php');
-			return true;
-		}
-
-		return false;
+		if(! in_array($name, self::$helpers))
+			return false;
+		
+		require(DIR . 'lib/helpers/' . $name. '.php');
+		
+		return true;
 	}
 	
 	public static function component($name)
 	{
-		if(in_array($name, self::$components))
-		{
-			require(DIR . 'lib/components/' . $name. '.php');
-			$name::init();
-			return true;
-		}
-
-		return false;
+		if(! in_array($name, self::$components))
+			return false;
+		
+		require(DIR . 'lib/components/' . $name. '.php');
+		$name::init();
+		
+		return true;
 	}
 }
 

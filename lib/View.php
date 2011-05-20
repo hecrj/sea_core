@@ -64,8 +64,9 @@ class View
 	 * $this->render('users/login_form'); --> Will load 'users/_login_form.php.html' partial file
 	 *
 	 * @param string $partial Name of the partial file to load. If it's null, the view is loaded.
+	 * @param array $options Hash of options, like collection set and cache directory and file in an array.
 	 */
-	public function render($partial = null)
+	public function render($partial = null, Array $options = null)
 	{
 			// Normal view if it's empty
 			if(empty($partial))
@@ -80,16 +81,32 @@ class View
 				// Set file path of partial: _partial_name
 				$file = DIR_VIEWS . $path . '_'.$partial_name . '.html.php';
 			}
-		
-			// ERROR 404 if the file isn't found
-			ExceptionUnless(is_file($file), 'The requested partial or view file doesn\'t exist in: <strong>'.$file.'</strong>');
-		
-			// Iterate over $data and set variables for layout
-			foreach($this->data as $key => $value)
-				$$key = $value;
-		
-			// Render file
-			require($file);
+					
+			// If cache is not needed
+			if(!isset($options['cache']))
+			{
+				// ERROR 404 if the file isn't found
+				ExceptionUnless(is_file($file), 'The requested partial or view file doesn\'t exist in: <strong>'.$file.'</strong>');
+				
+				// If collection is not defined
+				if(!isset($options['collection']))
+					// Iterate over $data and set variables for layout
+					foreach($this->data as $key => $value)
+						$$key = $value;
+				
+				// If collection is defined
+				else
+					// Set collection shortcut
+					$collection = $options['collection'];
+						
+				// Render file
+				require($file);	
+			}
+			
+			// If cache is needed and it does not load
+			elseif(! Cache::load($options['cache'][0], $options['cache'][1]))
+				// Generate and flush the cache
+				Cache::generate($this->data, $file, $options['cache'][0], $options['cache'][1], true);
 	}
 	
 }
