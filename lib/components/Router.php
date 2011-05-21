@@ -64,6 +64,9 @@ class Router implements Component
 		// Get subdomain info
 		$sub_info = self::$routes[self::$subdomain];
 		
+		// Exception if subdomain info is not defined
+		ExceptionUnless(isset($sub_info), 'Enrouting information is not defined for subdomain: <strong>'. self::$subdomain .'</strong>');
+		
 		// If isset subdomain matches
 		if(isset($sub_info['match']))
 			// If one route has matched...
@@ -73,24 +76,37 @@ class Router implements Component
 		
 		// Explode /  route
 		$route_parts = explode('/', $route, 8);
-				
-		// Controller is the first part of the route
-		$controller = array_shift($route_parts);
-				
-		// Action is the second part of the route
-		$action = array_shift($route_parts);
 		
-		// If controller isn't defined
-		if(empty($controller))
-			$controller = $sub_info['default'];
-		// If controller is defined, convert string to lower
+		// If has an static controller
+		if(isset($sub_info['static_controller']))
+			// Set controller as an static controller
+			$controller = $sub_info['static_controller'];
+		
+		// If subdomain does not have an static controller
 		else
 		{
-			$controller = strtolower($controller);
+			// Get controller from the route
+			$controller = array_shift($route_parts);
 			
-			if(isset($sub_info['exclude']))
-				ExceptionIf(in_array($controller, $sub_info['exclude']), 'The <strong>'. $controller .'</strong> controller is an excluded controller for this subdomain.<br />Check your <strong>routes.php</strong> configuration file.');
+			// If controller isn't defined
+			if(empty($controller))
+				$controller = $sub_info['controller'];
+
+			// If controller is defined
+			else
+			{
+				// Controller name string to lower
+				$controller = strtolower($controller);
+				
+				// If subdomain has info about excluded controllers
+				if(isset($sub_info['exclude']))
+					// Exception if the current controller is an excluded controller
+					ExceptionIf(in_array($controller, $sub_info['exclude']), 'The <strong>'. $controller .'</strong> controller is an excluded controller for this subdomain.<br />Check your <strong>routes.php</strong> configuration file.');
+			}
 		}
+				
+		// Get action from the route
+		$action = array_shift($route_parts);
 			
 		// If action isn't defined, it will be 'index()'
 		if(empty($action))
@@ -111,20 +127,43 @@ class Router implements Component
 	private static function route_matches($route, $match)
 	{	
 		// For each route match
-		foreach($match as $preg => $destination)
+		foreach($match as $preg => $route_data)
 		{
 			// If regular expression matches
 			if(preg_match('/'.$preg.'/', $route, $matches))
-			{
-				// Set the controller
-				self::$controller	=	$destination[0];
+			{	
+				// If route controller is integer
+				if(is_int($route_data[0]))
+				{
+					// Select match by integer and set controller
+					self::$controller = $matches[$route_data[0]];
+					
+					// Unset the controller match
+					unset($matches[$route_data[0]]);
+				}
+				// If route controller is not an integer
+				else
+					// Set controller as route controller
+					self::$controller = $route_data[0];
 				
-				// Set the action
-				self::$action		=	$destination[1];
+				// If route action is integer
+				if(is_int($route_data[1]))
+				{
+					// Select match by integer and set action
+					self::$action = $matches[$route_data[1]];
+					
+					// Unset the action match
+					unset($matches[$route_data[1]]);
+				}
+				
+				// If route action is not an integer
+				else
+					// Set action as route action
+					self::$action		=	$route_data[1];
 				
 				// Throw first match (complete string)
 				array_shift($matches);
-				
+					
 				// Set matches caught as arguments
 				self::$arguments = $matches;
 				
