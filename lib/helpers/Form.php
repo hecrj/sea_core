@@ -33,7 +33,7 @@ class Form
 	}
 	
 	// Open form tag --> <form action="/posts/add" method="post" accept-charset="utf-8" ...
-	public function open($action, Array $custom = null)
+	public function open($action = null, Array $custom = null)
 	{
 		$options = array('method' => 'post', 'accept-charset' => 'utf-8');
 		$options = $this->options_string($options, $custom);
@@ -50,9 +50,18 @@ class Form
 		
 		if($this->posted and $model)
 		{
+			if(is_object($model->errors))
+			{
+				if($model->errors->is_empty())
+					return null;
+			}
+			elseif($model->is_valid())
+				return null;
+				
 			$errors = '                    <div class="message error">
 	            <h3>Some errors have ocurred:</h3>
 	            <ul>'."\n";
+				
 			foreach($model->errors->full_messages() as $error_msg)
 			{
 				$errors .= '                        <li>' . $error_msg . '</li>'."\n";
@@ -79,7 +88,14 @@ class Form
 		
 		$options = $this->options_string($options, $custom);
 		
-		return $this->label($label, $name, '<input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . ' value="' . $this->model->$name . '" />');
+		return $this->label($label, $name, '<input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . (($this->model) ? ' value="' . $this->model->$name . '"' : '') .' />');
+	}
+	
+	public function hidden($name, Array $custom = null)
+	{
+		$options = $this->options_string(array(), $custom);
+		
+		return '                    <input name="' . $this->model_active . '[' . $name . ']" type="hidden"' . $options . (($this->model) ? ' value="' . $this->model->$name . '"' : '') .' />'."\n";
 	}
 	
 	public function textarea($label, $name, Array $custom = null)

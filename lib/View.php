@@ -9,6 +9,7 @@ class View
 	 * @var array
 	 */
 	private $data;
+	private $view;
 	
 	/**
 	 * Constructs a view.
@@ -20,8 +21,10 @@ class View
 	 * @param array $data Hash containing names and values of variables needed to be accessible in View
 	 * @return View
 	 */
-	public function __construct(Array $data)
+	public function __construct($view, Array $data)
 	{
+		// Set view
+		$this->view = $view;
 		// Set data given from controller
 		$this->data = $data;
 	}
@@ -70,7 +73,7 @@ class View
 	{
 			// Normal view if it's empty
 			if(empty($partial))
-				$file = DIR_VIEWS . Router::$controller . '/' . Router::$action . '.html.php';
+				$file = DIR_VIEWS . $this->view . '.html.php';
 		
 			// Partial if it isn't empty
 			else

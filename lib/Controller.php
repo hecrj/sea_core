@@ -5,11 +5,14 @@ abstract class Controller {
 	
 	protected $layout = 'application';
 	protected $access_filter = false;
-	private $view;
+	protected $view;
 	private $data = array();
     
 	public function __construct()
-	{		
+	{	
+		// Set view path
+		$this->view = Router::$controller . '/' . Router::$action;
+		
 		// Launch configuration of the controller
 		$this->configure();
     }
@@ -38,7 +41,7 @@ abstract class Controller {
 		$this->afterCall();
 		
 		// New View for controller
-		$this->view = new View($this->data);
+		$this->view = new View($this->view, $this->data);
 		
 		// Start output buffering
 		ob_start();
@@ -71,8 +74,15 @@ abstract class Controller {
 		
 		// If access filter is defined
 		if($this->access_filter)
-			// 403 if current user cannot access to current action
-			ExceptionUnless(Auth::$user->is($this->access_filter[$action]), 'Sorry, but you don\'t have enough privilegies to access this page.', 403);
+		{
+			// Set group or role to check. If is not defined, use '*' as key for default access filtering
+			$group_role = (isset($this->access_filter[$action])) ? $this->access_filter[$action] : $this->access_filter['*'];
+			
+			// If group role is not false
+			if($group_role)
+				// 403 if current user cannot access to current action
+				ExceptionUnless(Auth::$user->is($group_role), 'Sorry, but you don\'t have enough privilegies to access this page.', 403);
+		}
 			
 		// Call the action method in the controller
 		call_user_func_array(array($this, Router::$action), Router::$arguments);

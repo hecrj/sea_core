@@ -56,6 +56,9 @@ class Session implements Component
 	}
 	
 	public static function read($name, $unserialize = true){
+		if($name == 'flash')
+			unset($_SESSION['flash']);
+		
 		// Unserialize and return session data
 		return ($unserialize) ? unserialize(self::$data[$name]) : self::$data[$name];
 	}
