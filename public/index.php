@@ -5,8 +5,8 @@ $time = microtime(true);
 // Define absolute path to include files
 define('DIR', dirname(__DIR__).'/');
 
-// Website configuration
-require(DIR . 'config/website.php'); // <-- Revision pending
+// Boot configuration
+require(DIR . 'config/boot.php');
 // Constants needed first
 require(DIR . 'lib/Constants.php');
 // Core functions

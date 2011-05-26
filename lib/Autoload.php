@@ -4,7 +4,6 @@
 class Autoload
 {
 	private static $helpers = array('Form','Pagination','Cache');
-	private static $components = array();
 	
 	public static function helper($name)
 	{
@@ -17,11 +16,8 @@ class Autoload
 	}
 	
 	public static function component($name)
-	{
-		if(! in_array($name, self::$components))
-			return false;
-		
-		require(DIR . 'lib/components/' . $name. '.php');
+	{	
+		require(DIR . 'app/components/' . $name. '.php');
 		$name::init();
 		
 		return true;
