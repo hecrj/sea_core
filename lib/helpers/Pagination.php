@@ -6,6 +6,7 @@ class Pagination
 	static $default_limit = 10;
 	private $actual_page;
 	private $total_pages;
+	private $route;
 	
 	// Make a pagination
 	public static function make($model, $options = array())
@@ -53,6 +54,7 @@ class Pagination
 		// Set actual page and total pages
 		$this->actual_page = $actual_page;
 		$this->total_pages = $total_pages;
+		$this->route = Router::getRoute();
 	}
 	
 	public function render(Array $custom = null)
@@ -71,13 +73,13 @@ class Pagination
 		// If the actual page isn't 1
 		if($this->actual_page != 1)
 			// Print link to previous page
-			echo '                    <a href="' . Router::$route . 'page-' . ($this->actual_page - 1) . '">&laquo; Previous</a>'."\n";
+			echo '                    <a href="' . $this->route . 'page-' . ($this->actual_page - 1) . '">&laquo; Previous</a>'."\n";
 		
 		// If no page limit is set
 		if(!isset($options['pages']))
 			// Show all the pages
 			for($page = 1; $this->total_pages >= $page; $page ++)
-				echo '                    <a href="' . Router::$route . 'page-'. $page . '"' . (($this->actual_page == $page) ? ' class="active"' : '') . '>' . $page . '</a>'."\n";
+				echo '                    <a href="' . $this->route . 'page-'. $page . '"' . (($this->actual_page == $page) ? ' class="active"' : '') . '>' . $page . '</a>'."\n";
 		
 		// If page limit is set
 		else
@@ -99,13 +101,13 @@ class Pagination
 			
 			$this->render_previous_pages($previous_pages);
 			
-			echo '                    <a href="' . Router::$route . 'page-'. $this->actual_page . '" class="active">' . $this->actual_page . '</a>'."\n";
+			echo '                    <a href="' . $this->route . 'page-'. $this->actual_page . '" class="active">' . $this->actual_page . '</a>'."\n";
 			
 			$this->render_next_pages($next_pages);
 		}
 			
 		if($this->actual_page != $this->total_pages)
-			echo '                    <a href="' . Router::$route . 'page-' . ($this->actual_page + 1) . '">Next &raquo;</a>'."\n";
+			echo '                    <a href="' . $this->route . 'page-' . ($this->actual_page + 1) . '">Next &raquo;</a>'."\n";
 		
 		echo '                </div>'."\n";
 	}
@@ -115,7 +117,7 @@ class Pagination
 		$pages_diff = $this->actual_page - $pages;
 		
 		for($page = $this->actual_page - 1; $page > 0 and $page >= $pages_diff; $page --)
-			$previous_pages = '                    <a href="' . Router::$route . 'page-'. $page . '">' . $page . '</a>'."\n" . $previous_pages;
+			$previous_pages = '                    <a href="' . $this->route . 'page-'. $page . '">' . $page . '</a>'."\n" . $previous_pages;
 			
 		echo $previous_pages;
 	}
@@ -125,7 +127,7 @@ class Pagination
 		$pages_diff = $this->actual_page + $pages;
 		
 		for($page = $this->actual_page + 1; $page <= $this->total_pages and $page <= $pages_diff; $page ++)
-			echo '                    <a href="' . Router::$route . 'page-'. $page . '">' . $page . '</a>'."\n";
+			echo '                    <a href="' . $this->route . 'page-'. $page . '">' . $page . '</a>'."\n";
 	}
 	
 }

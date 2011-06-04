@@ -9,6 +9,7 @@ class Form
 	private $model;
 	private $inputs = array();
 	private $buttons = array();
+	private $editing = false;
 	
 	public function __construct()
 	{
@@ -38,7 +39,7 @@ class Form
 		$options = array('method' => 'post', 'accept-charset' => 'utf-8');
 		$options = $this->options_string($options, $custom);
 		
-		return '                <form action="/' . $action . '"' . $options . '>
+		return '                <form action="' . ((empty($action)) ? '' : '/'. $action) . '"' . $options . '>
                     <input name="csrf_token" type="hidden" value="' . Session::read('csrf_token') . '" />'."\n";
 	}
 	
@@ -48,29 +49,35 @@ class Form
 		$this->model = $model;
 		$this->model_active = $reference;
 		
-		if($this->posted and $model)
+		if($model)
 		{
-			if(is_object($model->errors))
-			{
-				if($model->errors->is_empty())
-					return null;
-			}
-			elseif($model->is_valid())
-				return null;
-				
-			$errors = '                    <div class="message error">
-	            <h3>Some errors have ocurred:</h3>
-	            <ul>'."\n";
-				
-			foreach($model->errors->full_messages() as $error_msg)
-			{
-				$errors .= '                        <li>' . $error_msg . '</li>'."\n";
-			}
-		
-			$errors .= '                    </ul>
-	            </div>'."\n";
+			if(!$this->editing)
+				$this->editing = !$model->is_new_record();
 			
-			return $errors;
+			if($this->posted)
+			{
+				if(is_object($model->errors))
+				{
+					if($model->errors->is_empty())
+						return null;
+				}
+				elseif($model->is_valid())
+					return null;
+
+				$errors = '                    <div class="message error">
+		            <h3>Some errors have ocurred:</h3>
+		            <ul>'."\n";
+
+				foreach($model->errors->full_messages() as $error_msg)
+				{
+					$errors .= '                        <li>' . $error_msg . '</li>'."\n";
+				}
+
+				$errors .= '                    </ul>
+		            </div>'."\n";
+
+				return $errors;
+			}
 		}
 	}
 	
@@ -88,14 +95,12 @@ class Form
 		
 		$options = $this->options_string($options, $custom);
 		
-		return $this->label($label, $name, '<input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . (($this->model) ? ' value="' . $this->model->$name . '"' : '') .' />');
-	}
-	
-	public function hidden($name, Array $custom = null)
-	{
-		$options = $this->options_string(array(), $custom);
+		$input = '<input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . (($this->model) ? ' value="' . $this->model->$name . '"' : '') .' />';
 		
-		return '                    <input name="' . $this->model_active . '[' . $name . ']" type="hidden"' . $options . (($this->model) ? ' value="' . $this->model->$name . '"' : '') .' />'."\n";
+		if($label)
+			return $this->label($label, $name, $input);
+		else
+			return $input;
 	}
 	
 	public function textarea($label, $name, Array $custom = null)
@@ -104,24 +109,37 @@ class Form
 		
 		$options = $this->options_string($options, $custom);
 		
-		return $this->label($label, $name, '<textarea name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . '>'. $this->model->$name . '</textarea>');
+		$textarea = '<textarea name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . '>'. $this->model->$name . '</textarea>';
+		
+		if($label)
+			return $this->label($label, $name, $textarea);
+		else
+			return $textarea;
 	}
 	
-	public function select($label, $name, Array $selects, Array $custom = null)
+	public function select($label, $name, Array $selects, Array $custom = null, $selected = null)
 	{
+		if(is_null($selected) and $this->model)
+			$selected = $this->model->$name;
+		
 		$options = array();
 		$options = $this->options_string($options, $custom);
 		
 		foreach($selects as $value => $option)
-			$select_options .= '                            <option value="' . $value . '"' . (($this->model->$name == $value) ? ' selected="selected"' : '') . '>' . $option . '</option>'."\n";
-			
-		return $this->label($label, $name, '<select name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"'. $options . '>' . "\n" . $select_options . '                        </select>');
+			$select_options .= '                            <option value="' . $value . '"' . (($selected == $value) ? ' selected="selected"' : '') . '>' . $option . '</option>'."\n";
+		
+		$select = '<select name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"'. $options . '>' . "\n" . $select_options . '                        </select>';
+		
+		if($label)
+			return $this->label($label, $name, $select);
+		else
+			return $select;		
 	}
 	
-	public function close($submit_text, $options = array())
+	public function close($default, $editing = null)
 	{
 		return '                    <div class="buttons">
-                        <button type="' . (($options['type']) ? $options['type'] : 'submit') . '" class="button">' . $submit_text . '</button>
+                        <button type="submit" class="button">' . (($editing and $this->editing) ? $editing : $default) . '</button>
                     </div>
                 </form>'."\n";
 	}

@@ -14,7 +14,7 @@ class Model extends ActiveRecord\Model
 		// If the request isn't AJAX request or $attribute isn't in hash of allowed attributes
 		if(!Request::isAjax() or !in_array($attribute, $attributes))
 			// Redirect to controller root page
-			Request::redirect('/' . Router::$controller);
+			Request::redirect('/' . Router::getController());
 		
 		// If the model isn't valid
 		if(!$this->is_valid())

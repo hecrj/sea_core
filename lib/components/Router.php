@@ -2,25 +2,61 @@
 
 class Router implements Component
 {	
-	static $controller;
-	static $controller_name;
-	static $action;
-	static $arguments;
-	static $hostname;
-	static $subdomain = 'www';
-	static $route;
-	static $routes = array();
+	private static $controller;
+	private static $action;
+	private static $arguments;
+	private static $hostname;
+	private static $subdomain = 'www';
+	private static $route;
+	private static $routes = array();
 	
 	public static function init()
 	{
 		// Require routes to match
 		require(DIR_CONFIG . 'routes.php');
 		
+		self::$routes = $routes;
+	}
+	
+	public static function getControllerFor($host, $route)
+	{
 		// Analyze server host and path info
-		self::analyze($_SERVER['HTTP_HOST'], $_SERVER['PATH_INFO']);
+		self::analyze($host, $route);
 		
 		// Set controller name
-		self::$controller_name = ucwords(self::$controller) . 'Controller';
+		$controller_name = ucwords(self::$controller) . 'Controller';
+		
+		// Setting controller path
+		$controller_file	=	DIR_CONTROLLERS . $controller_name . '.php';
+	
+		// Exception if controller file doesn't exist
+		ExceptionUnless(is_file($controller_file), 'Controller: <strong>'. $controller_file .'</strong> not found!');
+
+		// Require the controller
+		require_once($controller_file);
+		
+		// Return controller object
+		return new $controller_name;
+	}
+	
+	public static function getController()
+	{
+		return self::$controller;
+	}
+	
+	public static function getAction()
+	{
+		return self::$action;
+	}
+	
+	public static function getArguments()
+	{
+		return self::$arguments;
+	}
+	
+	public static function getRoute()
+	{
+		return self::$route;
 	}
 	
 	# Analyze route and extract request info
@@ -171,6 +207,9 @@ class Router implements Component
 				return true;
 			}
 		}
+		
+		// No matches found
+		return false;
 	}
 
 }

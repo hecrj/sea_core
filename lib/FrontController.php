@@ -6,6 +6,9 @@ class FrontController
 	
 	static function init()
 	{
+		// Start otuput buffering
+		ob_start();
+		
 		try
 		{
 		
@@ -21,22 +24,11 @@ class FrontController
 			Session::init(); // Session component
 			Security::init(); // Security component
 			Auth::init(); // Auth component
-		
-			// Setting controller path
-			$controller_file	=	DIR_CONTROLLERS . Router::$controller_name . '.php';
-		
-			// Exception if controller file doesn't exist
-			ExceptionUnless(is_file($controller_file), 'Controller: <strong>'. $controller_file .'</strong> not found!');
-
-			// Require the controller
-			require_once($controller_file);
-				
-			// Instance the controller
-			$Controller = new Router::$controller_name;
 			
-			// Initialize the controller
-			$Controller->init(Router::$action);
+			// Get and initialize controller to request
+			Router::getControllerFor($_SERVER['HTTP_HOST'], $_SERVER['PATH_INFO'])->init(Router::getAction(), Router::getArguments());
 		}
+		
 		catch (Exception $e)
 		{
 			// Clean output buffering
@@ -44,12 +36,11 @@ class FrontController
 			
 			// Require error page
 			if(! @include(DIR .'public/'. $e->getCode() .'.php'))
-				echo 'The requested '. $e->getCode() .' error page does not exist!';
-			
-			// End and flush output buffering
-			ob_end_flush();
+				echo 'The requested '. $e->getCode() .' error page does not exist!<br />'.$e->getMessage();
 		}
 		
+		// End and flush output buffering
+		ob_end_flush();
  	}
 }
 
