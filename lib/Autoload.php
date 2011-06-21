@@ -17,7 +17,9 @@ class Autoload
 	
 	public static function component($name)
 	{	
-		require(DIR . 'app/components/' . $name. '.php');
+		if(! @include(DIR . 'app/components/' . $name. '.php'))
+			throw new Exception('Unable to load class: <strong>'. $name .'</strong>', 404);
+		
 		$name::init();
 		
 		return true;

@@ -50,7 +50,7 @@ abstract class Controller {
 		if($this->access_filter)
 		{
 			// Exception unless Auth class exists
-			ExceptionUnless(class_exists('Auth') and is_a(Auth::$user, 'UserBase'), 'Native access filtering needs an Auth component class with static $user property having an UserBase based model as content.');
+			ExceptionUnless(is_a(Auth::$user, 'UserBase'), 'Native access filtering needs an Auth component class with static $user property having an UserBase based model as content.');
 			
 			// Set group or role to check. If is not defined, use '*' as key for default access filtering
 			$group_role = (isset($this->access_filter[$action])) ? $this->access_filter[$action] : $this->access_filter['*'];
