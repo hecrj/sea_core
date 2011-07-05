@@ -1,5 +1,10 @@
 <?php
 
+namespace Core;
+use Core\Components\Request;
+use Core\Components\DynamicInjector;
+use Core\Components\Cache;
+
 ### View class
 class View
 {	
@@ -8,9 +13,9 @@ class View
 	 *
 	 * @var array
 	 */
+	private $request;
 	private $controller;
-	private $action;
-	private $data;
+	private $injector;
 	
 	/**
 	 * Constructs a view.
@@ -19,19 +24,38 @@ class View
 	 * Then @param $data, which contains all data necessary for View, is passed to the constructor by
 	 * Controller and it's assigned to @var $data in View object.
 	 *
-	 * @param array $data Hash containing names and values of variables needed to be accessible in View
+	 * @param object $request       Core\Components\Request    A request object
+	 * @param object $controller    Core\Controller            A controller object
 	 * @return View
 	 */
-	public function __construct(Array $view, Array $data)
+	public function __construct(Request $request, Controller $controller, DynamicInjector $injector)
 	{
-		// Set controller related view
-		$this->controller = $view[0];
+		// Set view request
+		$this->request = $request;
 		
-		// Set action related view
-		$this->action = $view[1];
+		// Set view controller
+		$this->controller = $controller;
 		
-		// Set data given from controller
-		$this->data = $data;
+		// Set helper injector
+		$this->injector = $injector;
+	}
+	
+	public function init()
+	{
+		// If Request is an AJAX request
+		if($this->request->isAjax())
+			// Render only the view, without layout
+			$this->render();
+
+		// If Request is not an AJAX request
+		else
+			// Load layout associated to controller
+			$this->load();
+	}
+	
+	protected function get($name)
+	{
+		return $this->injector->get($name);
 	}
 	
 	/**
@@ -41,16 +65,19 @@ class View
 	 *
 	 * @param string $file Name of the layout file to load
 	 */
-	public function load($file)
-	{	
+	private function load()
+	{
+		$view = $this;
+		
 		// Set layout path
-		$layout_file = DIR_VIEWS . 'layouts/' . $file . '.html.php';
+		$layout_file = DIR_VIEWS . 'layouts/' . $this->controller->getLayout() . '.html.php';
 		
 		// Exception if the layout doesn't exist
-		ExceptionUnless(is_file($layout_file), 'The requested layout file doesn\'t exist in: <strong>'.$layout_file.'</strong>');
+		if(! is_file($layout_file))
+			throw new \RuntimeException('The requested layout file doesn\'t exist in: <strong>'.$layout_file.'</strong>', 404);
 		
 		// Iterate over $data and set variables for layout
-		foreach($this->data as $key => $value)
+		foreach($this->controller->getData() as $key => $value)
 			$$key = $value;
 			
 		// Render layout
@@ -76,45 +103,62 @@ class View
 	 */
 	public function render($partial = null, Array $options = null)
 	{
-			// Normal view if it's empty
-			if(empty($partial))
-				$file = DIR_VIEWS . $this->controller .'/'. $this->action .'.html.php';
+		$view = $this;
 		
-			// Partial if it isn't empty
+		// Normal view if it's empty
+		if(empty($partial))
+			$file = DIR_VIEWS . $this->controller->getView() .'.html.php';
+	
+		// Partial if it isn't empty
+		else
+		{
+			// Get partial name with preg_split
+			list(/* EMPTY */, $path, $partial_name) = preg_split('/(.*\/)?([^\/]+)/', $partial, 0, PREG_SPLIT_DELIM_CAPTURE);
+		
+			// Set file path of partial: _partial_name
+			$file = DIR_VIEWS . $path . '_'.$partial_name . '.html.php';
+		}
+				
+		// If cache is set
+		if($options['cache'] instanceof Cache)
+		{
+			if(!$options['cache']->load())
+				$options['cache']->flush()->generate($file);
+		}
+		
+		// If cache is not set
+		else
+		{
+			// ERROR 404 if the file isn't found
+			if(!is_file($file))
+				throw new \RuntimeException('The requested partial or view file doesn\'t exist in: <strong>'.$file.'</strong>');
+			
+			// If collection is not defined
+			if(!isset($options['collection']))
+				// Iterate over $data and set variables for layout
+				foreach($this->controller->getData() as $key => $value)
+					$$key = $value;
+			
+			// If collection is defined
 			else
-			{
-				// Get partial name with preg_split
-				list(/* EMPTY */, $path, $partial_name) = preg_split('/(.*\/)?([^\/]+)/', $partial, 0, PREG_SPLIT_DELIM_CAPTURE);
-			
-				// Set file path of partial: _partial_name
-				$file = DIR_VIEWS . $path . '_'.$partial_name . '.html.php';
-			}
+				// Set collection shortcut
+				$collection = $options['collection'];
 					
-			// If cache is not needed
-			if(!isset($options['cache']))
-			{
-				// ERROR 404 if the file isn't found
-				ExceptionUnless(is_file($file), 'The requested partial or view file doesn\'t exist in: <strong>'.$file.'</strong>');
-				
-				// If collection is not defined
-				if(!isset($options['collection']))
-					// Iterate over $data and set variables for layout
-					foreach($this->data as $key => $value)
-						$$key = $value;
-				
-				// If collection is defined
-				else
-					// Set collection shortcut
-					$collection = $options['collection'];
-						
-				// Render file
-				require($file);	
-			}
-			
-			// If cache is needed and it does not load
-			elseif(! Cache::load($options['cache'][0], $options['cache'][1]))
-				// Generate and flush the cache
-				Cache::generate($this->data, $file, $options['cache'][0], $options['cache'][1], true);
+			// Render file
+			require($file);
+		}
+	}
+	
+	public function css_tag($path_file, $media = 'screen')
+	{
+		return '<link href="/css/' . $path_file . '.css" rel="stylesheet" type="text/css" media="'.$media.'" />
+	';
+	}
+	
+	public function js_tag($path_file)
+	{
+		return '<script src="/js/' . $path_file . '.js" type="text/javascript"></script>
+	';
 	}
 	
 }

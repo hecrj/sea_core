@@ -1,8 +1,13 @@
 <?php
 
+namespace Core\Helpers;
+use Core\Components\Security;
+use Core\Components\Request;
+
 # Form helper
 class Form
 {
+	private $security;
 	private $posted;
 	private $models = array();
 	private $model_active;
@@ -11,10 +16,14 @@ class Form
 	private $buttons = array();
 	private $editing = false;
 	
-	public function __construct()
+	public function __construct(Security $security, Request $request)
 	{
+		// Set dependencies
+		$this->security = $security;
+		$this->request = $request;
+		
 		// Set if the form has been posted
-		$this->posted = Request::isPost();
+		$this->posted = ($request->getMethod() == 'POST');
 		
 		// Set models defined as arguments of the constructor
 		if($models = func_get_args())
@@ -39,8 +48,10 @@ class Form
 		$options = array('method' => 'post', 'accept-charset' => 'utf-8');
 		$options = $this->options_string($options, $custom);
 		
-		return '                <form action="' . ((empty($action)) ? '' : '/'. $action) . '"' . $options . '>
-                    <input name="csrf_token" type="hidden" value="' . Session::read('csrf_token') . '" />'."\n";
+		echo '                <form action="' . ((empty($action)) ? '' : '/'. $action) . '"' . $options . '>
+                    <input name="csrf_token" type="hidden" value="' . $this->security->getCSRFToken() . '" />'."\n";
+		
+		return $this;
 	}
 	
 	public function to($reference, $model = false)
@@ -76,14 +87,16 @@ class Form
 				$errors .= '                    </ul>
 		            </div>'."\n";
 
-				return $errors;
+				echo $errors;
 			}
 		}
+		
+		return $this;
 	}
 	
 	public function label($label, $name, $content)
 	{	
-		return '                    <div id="field_' . $name .'"' . (($this->posted and $this->model) ? ' class="' . (($this->model->errors->on($name)) ? 'error' : 'success') . '"' : '' ) . '>
+		echo '                    <div id="field_' . $name .'"' . (($this->posted and $this->model) ? ' class="' . (($this->model->errors->on($name)) ? 'error' : 'success') . '"' : '' ) . '>
                         <label for="' . $name . '">' . $label . '</label>
                         ' . $content . '
                     </div>'."\n";
@@ -98,9 +111,11 @@ class Form
 		$input = '<input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . (($this->model) ? ' value="' . htmlentities($this->model->$name) . '"' : '') .' />';
 		
 		if($label)
-			return $this->label($label, $name, $input);
+			$this->label($label, $name, $input);
 		else
-			return $input;
+			echo $input;
+			
+		return $this;
 	}
 	
 	public function textarea($label, $name, Array $custom = null)
@@ -112,9 +127,11 @@ class Form
 		$textarea = '<textarea name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . '>'. (($this->model) ? htmlentities($this->model->$name) : '') . '</textarea>';
 		
 		if($label)
-			return $this->label($label, $name, $textarea);
+			$this->label($label, $name, $textarea);
 		else
-			return $textarea;
+			echo $textarea;
+		
+		return $this;
 	}
 	
 	public function select($label, $name, Array $selects, Array $custom = null, $selected = null)
@@ -131,14 +148,16 @@ class Form
 		$select = '<select name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"'. $options . '>' . "\n" . $select_options . '                        </select>';
 		
 		if($label)
-			return $this->label($label, $name, $select);
+			$this->label($label, $name, $select);
 		else
-			return $select;		
+			echo $select;
+		
+		return $this;
 	}
 	
 	public function close($default, $editing = null)
 	{
-		return '                    <div class="buttons">
+		echo '                    <div class="buttons">
                         <button type="submit" class="button">' . (($editing and $this->editing) ? $editing : $default) . '</button>
                     </div>
                 </form>'."\n";

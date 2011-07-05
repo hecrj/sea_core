@@ -1,16 +1,41 @@
 <?php
 
+namespace Core\Components;
+use Core\Components\Session;
+use Core\Components\Request;
+
 # Security component
-class Security implements Component
+class Security
 {
-	public static function init()
+	private $session;
+	private $request;
+	private $csrf_token;
+	
+	public function __construct(Session $session, Request $request)
 	{
-		// If a CSRF token doesn't exist
-		if(!Session::exists('csrf_token'))
-			// Generate and save one
-			Session::write('csrf_token', md5(uniqid(rand(), TRUE)));
+		// Set dependencies
+		$this->session = $session;
+		$this->request = $request;
+		
+		// If a CSRF token exists
+		if($session->exists('csrf_token'))
+			// Read CSRF Token from session
+			$this->csrf_token = $session->read('csrf_token');
+		
+		else
+		{
+			// Generate a CSRF Token
+			$this->csrf_token = md5(uniqid(rand(), TRUE));
 			
-		ExceptionIf((Request::isPost() and Session::read('csrf_token') != Request::params('csrf_token')), 'Cross Site Request Forgery detected!');
+			// Save token
+			$session->write('csrf_token', $this->csrf_token);
+		}
+			
+	}
+	
+	public function getCSRFToken()
+	{
+		return $this->csrf_token;
 	}
 }
 

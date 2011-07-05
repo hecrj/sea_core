@@ -1,6 +1,7 @@
 <?php
 
-# Constants needed by core system framework to work correctly
+namespace Core;
+
 # Models directory
 define('DIR_MODELS', DIR . 'app/models/');
 # Controllers directory

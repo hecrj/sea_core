@@ -1,5 +1,7 @@
 <?php
 
+namespace Core;
+
 # Model class
 class Model extends ActiveRecord\Model
 {

@@ -1,11 +1,18 @@
 <?php
 
+namespace Core\Components;
+
 ### Session component
-class Session implements Component
+class Session
 {
-	private static $data = array();
+	private $data = array();
 	
-	public static function init(){
+	public function __construct(){
+		$this->init();
+	}
+	
+	private function init()
+	{
 		// Configure sessions
 		session_set_cookie_params(0, '/', '.'.WEB_DOMAIN);
 		
@@ -13,12 +20,12 @@ class Session implements Component
 		session_start();
 				
 		// Get session data
-		self::$data = $_SESSION;
+		$this->data = $_SESSION;
 	}
-
-	public static function destroy($destroy_cookie = false){
+	
+	public function destroy($destroy_cookie = false){
 		// Get flash message
-		$flash = self::read('flash', false);
+		$flash = $this->read('flash', false);
 		
 		// Delete global data
 		$_SESSION = array();
@@ -39,44 +46,44 @@ class Session implements Component
 		session_destroy();
 		
 		// Restart component
-		self::init();
+		$this->init();
 		
 		// Rewrite flash message
-		self::write('flash', $flash, false);
+		$this->write('flash', $flash, false);
 	}
 	
-	public static function write($name, $value, $serialize = true){
+	public function write($name, $value, $serialize = true){
 		// Adding value to session and data
-		$_SESSION[$name] = self::$data[$name] = ($serialize) ? serialize($value) : $value;
+		$_SESSION[$name] = $this->data[$name] = ($serialize) ? serialize($value) : $value;
 	}
 	
-	public static function flash($flash_message){
+	public function flash($flash_message){
 		// Flash shortcut
-		self::write('flash', $flash_message);
+		$this->write('flash', $flash_message);
 	}
 	
-	public static function read($name, $unserialize = true){
+	public function read($name, $unserialize = true){
 		if($name == 'flash')
 			unset($_SESSION['flash']);
 		
 		// Unserialize and return session data
-		return ($unserialize) ? unserialize(self::$data[$name]) : self::$data[$name];
+		return ($unserialize) ? unserialize($this->data[$name]) : $this->data[$name];
 	}
 	
-	public static function delete($name){
-		if(self::exists($name))
+	public function delete($name){
+		if($this->exists($name))
 		{
 			// Delete session data
 			unset($_SESSION[$name]);
 			
 			// Delete data
-			unset(self::$data[$name]);
+			unset($this->data[$name]);
 		}
 	}
 	
-	public static function exists($name){
+	public function exists($name){
 		// Check if exists session data
-		return array_key_exists($name, self::$data);
+		return array_key_exists($name, $this->data);
 	}
 }
 

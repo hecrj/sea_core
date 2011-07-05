@@ -1,117 +1,67 @@
 <?php
 
-class Router implements Component
-{	
-	private static $controller;
-	private static $action;
-	private static $arguments;
-	private static $hostname;
-	private static $subdomain = 'www';
-	private static $route;
-	private static $routes = array();
-	
-	public static function init()
-	{
-		// Require routes to match
-		require(DIR_CONFIG . 'routes.php');
-		
-		self::$routes = $routes;
-	}
-	
-	public static function getControllerFor($host, $route)
-	{
-		// Analyze server host and path info
-		self::analyze($host, $route);
-		
-		// Set controller name
-		$controller_name = ucwords(self::$controller) . 'Controller';
-		
-		// Setting controller path
-		$controller_file	=	DIR_CONTROLLERS . $controller_name . '.php';
-	
-		// Exception if controller file doesn't exist
-		ExceptionUnless(is_file($controller_file), 'Controller: <strong>'. $controller_file .'</strong> not found!');
+namespace Core\Components;
 
-		// Require the controller
-		require_once($controller_file);
+class Router
+{
+	private $request;
+	private $routes_file;
+	private $controller_name;
+	private $controller_action;
+	private $controller_arguments;
+	
+	public function __construct(Request $request, $routes_file = 'routes')
+	{
+		$this->request     = $request;
+		$this->routes_file = DIR_CONFIG . $routes_file . '.php';
 		
-		// Return controller object
-		return new $controller_name;
+		$this->processRoutes();
 	}
 	
-	public static function getController()
+	public function getControllerClassName($namespace = 'App\\Controllers\\')
 	{
-		return self::$controller;
-	}
-	
-	public static function getAction()
-	{
-		return self::$action;
-	}
-	
-	public static function getArguments()
-	{
-		return self::$arguments;
-	}
-	
-	public static function getRoute()
-	{
-		return self::$route;
+		if(isset($this->controller_class_name))
+			return $this->controller_class_name;
+		
+		// Return controller class name
+		return $this->controller_class_name = $namespace . ucwords($this->controller_name) . 'Controller';;
 	}
 	
 	# Analyze route and extract request info
-	private static function analyze($host, $route){
-		// Explode host
-		$host_parts = explode('.', $host);
+	private function processRoutes()
+	{
+		if(! is_file($this->routes_file))
+			throw new \RuntimeException('Routes file not found in: <strong>'. $this->routes_file .'</strong>', 404);
 		
-		// If host has 3 or more parts has a subdomain
-		if(count($host_parts) > 2)
-		{
-			// Set subdomain
-			self::$subdomain = $host_parts[0];
-			
-			// Set hostname
-			self::$hostname  = $host_parts[1];
-		}
-		else
-			// Set hostname
-			self::$hostname  = $host_parts[0];
+		// Require routes to match
+		require($this->routes_file);
 		
-		// Get pagination page
-		if(strpos($route, '/page-') !== FALSE)
-		{
-			// Split route and set pagination page to use in Request component
-			list(/* EMPTY */, $route, $_GET['page']) = preg_split('/^(.*)page-([0-9]+)?$/', $route, 0, PREG_SPLIT_DELIM_CAPTURE);
-		}
-		
-		// If route doesn't have / at the end
-		if(substr($route, -1) != '/')
-			self::$route = $route . '/';
-		else
-		{
-			self::$route = $route;
-			$route = substr($route, 0, strlen($route) - 1);
-		}
+		// Get route
+		$route = $this->request->getRoute();
 			
 		// Remove / at the beginning
 		if(strpos($route, '/') === 0)
 			$route = substr($route, 1);
 		
+		// Get subdomain
+		$subdomain = $this->request->getSubdomain();
+		
 		// Get subdomain info
-		$sub_info = self::$routes[self::$subdomain];
+		$sub_info = $routes[$subdomain];
 		
 		// Exception if subdomain info is not defined
-		ExceptionUnless(isset($sub_info), 'Enrouting information is not defined for subdomain: <strong>'. self::$subdomain .'</strong>');
+		if(! isset($sub_info))
+			throw new \RuntimeException('Enrouting information is not defined for subdomain: <strong>'. $subdomain .'</strong>', 404);
 		
 		// If isset subdomain matches
 		if(isset($sub_info['match']))
 			// If one route has matched...
-			if(self::route_matches($route, $sub_info['match']))
+			if($this->checkMatches($route, $sub_info['match']))
 				// Return true and stop analyzing
 				return true;
 		
 		// Explode /  route
-		$route_parts = explode('/', $route, 8);
+		$route_parts = explode('/', $route);
 		
 		// If has an static controller
 		if(isset($sub_info['static_controller']))
@@ -137,7 +87,9 @@ class Router implements Component
 				// If subdomain has info about excluded controllers
 				if(isset($sub_info['exclude']))
 					// Exception if the current controller is an excluded controller
-					ExceptionIf(in_array($controller, $sub_info['exclude']), 'The <strong>'. $controller .'</strong> controller is an excluded controller for this subdomain.<br />Check your <strong>routes.php</strong> configuration file.');
+					if(in_array($controller, $sub_info['exclude']))
+						throw new RuntimeException('The <strong>'. $controller .'</strong> controller is an excluded controller for this
+						subdomain.<br />Check your <strong>'. $this->routes_file .'.php</strong> configuration file.', 404);
 			}
 		}
 				
@@ -152,15 +104,38 @@ class Router implements Component
 			$action = strtolower($action);
 		
 		// Defining data
-		self::$controller	=	$controller;
-		self::$action 		=	$action;
-								
-		// The arguments must be 5 parameters minimum
-		self::$arguments = array_pad((array)$route_parts, 5, 0);
+		$this->controller_name      = $controller;
+		$this->controller_action    = $action;
+		$this->controller_arguments = $route_parts;
+	}
+	
+	public function getRequest()
+	{
+		return $this->request;
+	}
+	
+	public function getRoutesFile()
+	{
+		return $this->routes_file;
+	}
+	
+	public function getControllerName()
+	{
+		return $this->controller_name;
+	}
+	
+	public function getControllerAction()
+	{
+		return $this->controller_action;
+	}
+	
+	public function getControllerArguments()
+	{
+		return $this->controller_arguments;
 	}
 	
 	# Search for route matches declared in config/routes.php
-	private static function route_matches($route, $match)
+	private function checkMatches($route, $match)
 	{	
 		// For each route match
 		foreach($match as $preg => $route_data)
@@ -172,7 +147,7 @@ class Router implements Component
 				if(is_int($route_data[0]))
 				{
 					// Select match by integer and set controller
-					self::$controller = $matches[$route_data[0]];
+					$this->controller = $matches[$route_data[0]];
 					
 					// Unset the controller match
 					unset($matches[$route_data[0]]);
@@ -180,13 +155,13 @@ class Router implements Component
 				// If route controller is not an integer
 				else
 					// Set controller as route controller
-					self::$controller = $route_data[0];
+					$this->controller = $route_data[0];
 				
 				// If route action is integer
 				if(is_int($route_data[1]))
 				{
 					// Select match by integer and set action
-					self::$action = $matches[$route_data[1]];
+					$this->action = $matches[$route_data[1]];
 					
 					// Unset the action match
 					unset($matches[$route_data[1]]);
@@ -195,13 +170,13 @@ class Router implements Component
 				// If route action is not an integer
 				else
 					// Set action as route action
-					self::$action		=	$route_data[1];
+					$this->$action		=	$route_data[1];
 				
 				// Throw first match (complete string)
 				array_shift($matches);
 					
 				// Set matches caught as arguments
-				self::$arguments = $matches;
+				$this->arguments = $matches;
 				
 				// Return true and stop searching
 				return true;

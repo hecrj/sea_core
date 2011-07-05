@@ -1,21 +1,32 @@
 <?php
 
+namespace Core;
+use Core\Components\Router;
+use Core\Components\DynamicInjector;
+
 ### Controller abstract class
 abstract class Controller {
 	
+	protected $router;
 	protected $layout = 'application';
 	protected $access_filter = false;
-	protected $view;
+	protected $before_filter;
+	protected $after_filter;
 	private $name;
+	private $injector;
+	private $view;
 	private $data = array();
     
-	public function __construct()
+	public function __construct(DynamicInjector $injector)
+	{	
+		$class_name = get_class($this);
+		$this->name = strtolower(substr($class_name, strrpos($class_name, '\\')+1, -10));
+		$this->injector = $injector;
+	}
+	
+	public function get($name)
 	{
-		// Getting controller class name
-		$class = get_class($this);
-		
-		// Set controller name deleting "Controller" suffix and lowercasing
-		$this->name = strtolower(substr($class, 0, strlen($class) - 10));
+		return $this->injector->get($name);
 	}
 
 	public function __set($key, $value)
@@ -31,22 +42,24 @@ abstract class Controller {
 	public function init($action, $arguments)
 	{	
 		// Set view path
-		$this->view = array($this->name, $action);
+		$this->view = $this->name . DIRECTORY_SEPARATOR . $action;
 		
 		// Call before filter function
-		if($this->before_filter)
+		if(isset($this->before_filter))
 			$this->callbacksFor($action, $this->before_filter);
 		
 		// Exception if the action method doesn't exist --> Exception
-		ExceptionUnless(method_exists($this, $action), 'The called action: <strong>'. $action .'</strong> does not exist in '. get_class($this) .'!');
+		if(! method_exists($this, $action))
+			throw new \RuntimeException('The called action: <strong>'. $action .'</strong> does not exist in '. get_class($this) .'!');
 			
 		// Reflection to check type of method
-		$Reflection = new ReflectionMethod($this, $action);
+		$r = new \ReflectionMethod($this, $action);
 		
 		//  Exception if the method isn't public --> Exception
-		ExceptionUnless($Reflection->isPublic(), 'The called action: <strong>'. $action .'</strong> is not public!');
+		if(! $r->isPublic())
+			throw new \RuntimeException('The called action: <strong>'. $action .'</strong> is not public!');
 		
-		// If access filter is defined
+		/*/ If access filter is defined
 		if($this->access_filter)
 		{
 			// Exception unless Auth class exists
@@ -59,27 +72,57 @@ abstract class Controller {
 			if($group_role)
 				// 403 if current user cannot access to current action
 				ExceptionUnless(Auth::$user->is($group_role), 'Sorry, but you don\'t have enough privilegies to access this page.', 403);
-		}
+		}*/
 		
-		// Call the action method in the controller
-		call_user_func_array(array($this, $action), $arguments);
+		// Get number of required parameters
+		$num_params	= $r->getNumberOfRequiredParameters();
+		
+		// Get number of args
+		$num_args	= count($arguments);
+		
+		// If there are more required parameters than args
+		if($num_params > $num_args)
+			$num_args = $num_params;
+		
+		// Switch to avoid call_user_func_array depending the number of args
+		switch ($num_args)
+		{
+		    case 0: return $this->$action(); break;
+		    case 1: return $this->$action($arguments[0]); break;
+		    case 2: return $this->$action($arguments[0], $arguments[1]); break;
+		    case 3: return $this->$action($arguments[0], $arguments[1], $arguments[2]); break;
+		    case 4: return $this->$action($arguments[0], $arguments[1], $arguments[2], $arguments[3]); break;
+		    case 5: return $this->$action($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4]); break;
+		    case 6: return $this->$action($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5]); break;
+		    case 7: return $this->$action($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5], $arguments[6]); break;
+		    case 8: return $this->$action($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5], $arguments[6], $arguments[7]); break;
+		    case 9: return $this->$action($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5], $arguments[6], $arguments[7], $arguments[8]); break;
+		    default: return call_user_func_array(array($this, $action), $arguments);
+		}
 		
 		// Call after filter action
 		if($this->after_filter)
 			$this->callbacksFor($action, $this->after_filter);
-		
-		// New View for controller
-		$this->view = new View($this->view, $this->data);
-		
-		// If Request isn't an AJAX request
-		if(!Request::isAjax())
-			// Load layout associated to controller
-			$this->view->load($this->layout);
-		
-		// If Request is an AJAX request
-		else
-			// Render only the view, without layout
-			$this->view->render();
+	}
+	
+	public function getLayout()
+	{
+		return $this->layout;
+	}
+	
+	public function getView()
+	{
+		return $this->view;
+	}
+	
+	public function getData()
+	{
+		return $this->data;
+	}
+	
+	protected function setView($dir, $view)
+	{
+		$this->view = $dir . DIRECTORY_SEPARATOR . $view;
 	}
 	
 	private function callbacksFor($action, Array $callbacks){

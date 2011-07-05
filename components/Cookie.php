@@ -1,16 +1,18 @@
 <?php
 
+namespace Core\Component;
+
 ### Cookie component
-class Cookie implements Component
+class Cookie
 {
-	private static $data = array();
+	private $data = array();
 	
-	public static function init(){		
+	public function init(){		
 		// Get cookie data
-		self::$data = $_COOKIE;
+		$this->data = $_COOKIE;
 	}
 	
-	public static function create($name, $value, $time = 2592000, $path = '/'){
+	public function create($name, $value, $time = 2592000, $path = '/'){
 		// Encode value
 		$value = base64_encode($value);
 		
@@ -18,29 +20,29 @@ class Cookie implements Component
 		setcookie($name, $value, time()+$time, $path, '.'.WEB_DOMAIN);
 		
 		// Add value to data
-		self::$data[$name] = $value;
+		$this->data[$name] = $value;
 	}
 	
-	public static function delete($name){
+	public function delete($name){
 		// If cookie exists
-		if(self::exists($name))
+		if($this->exists($name))
 		{
 			// Delete cookie
 			setcookie($name, '', 0, '/', '.'.WEB_DOMAIN);
 			
 			// Unset the data
-			unset(self::$data[$name]);
+			unset($this->data[$name]);
 		}
 	}
 	
-	public static function read($name){
+	public function read($name){
 		// Decode and return Cookie data
-		return base64_decode(self::$data[$name]);
+		return base64_decode($this->data[$name]);
 	}
 	
-	public static function exists($name){
+	public function exists($name){
 		// Return if requested data exists
-		return array_key_exists($name, self::$data);
+		return array_key_exists($name, $this->data);
 	}
 }
 
