@@ -14,7 +14,7 @@ class Autoloader
 	
 	public function load($name)
 	{
-		if(false !== $pos = strrpos($name, '\\'))
+		if(strpos($name, '\\') !== false)
 		{
 			$namespaces = explode('\\', $name);
 			$class_name = array_pop($namespaces);
@@ -25,7 +25,7 @@ class Autoloader
 			$path = strtolower(implode(DIRECTORY_SEPARATOR, $namespaces)) . DIRECTORY_SEPARATOR . $class_name. '.php';
 		}
 		else
-			$path = 'models/'.$name.'.php';
+			$path = 'app/models/'.$name.'.php';
 		
 		if(! is_file(DIR . $path))
 			throw new \Exception('Unable to load class: <strong>'. $name .'</strong>', 404);

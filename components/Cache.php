@@ -67,11 +67,11 @@ class Cache
 			ob_end_clean();
 		
 		// Make directories for cache files --> Recursive
-		if(!file_exists(DIR_CACHE . $this->path) and ! @mkdir(DIR_CACHE . $this->path, 0777, true))
+		if(!file_exists(DIR . 'cache/' . $this->path) and ! @mkdir(DIR . 'cache/' . $this->path, 0777, true))
 			throw new \RuntimeException('Impossible to create directories for cache files: ' . $this->path, 404);
 
 		// Generate cache file
-		file_put_contents(DIR_CACHE . $this->path .'/'. $this->filename .'.cache', $content);
+		file_put_contents(DIR . 'cache/' . $this->path .'/'. $this->filename .'.cache', $content);
 		
 		return $this;
 	}
@@ -79,7 +79,7 @@ class Cache
 	public function load()
 	{
 		// Set cache file path
-		$full_path = DIR_CACHE . $this->path .'/'. $this->filename .'.cache';
+		$full_path = DIR . 'cache/' . $this->path .'/'. $this->filename .'.cache';
 		
 		// If cache file does not exist
 		if(! is_file($full_path))
@@ -94,7 +94,7 @@ class Cache
 	public function clean($directory, $file = null)
 	{
 		// Set directory path
-		$dir_path = DIR_CACHE . $directory;
+		$dir_path = DIR . 'cache/' . $directory;
 		
 		// If directory path has / final
 		if(substr($dir_path, -1) == '/')

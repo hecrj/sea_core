@@ -7,12 +7,14 @@ class Cookie
 {
 	private $data = array();
 	
-	public function init(){		
+	public function __construct()
+	{		
 		// Get cookie data
 		$this->data = $_COOKIE;
 	}
 	
-	public function create($name, $value, $time = 2592000, $path = '/'){
+	public function create($name, $value, $time = 2592000, $path = '/')
+	{
 		// Encode value
 		$value = base64_encode($value);
 		
@@ -23,7 +25,8 @@ class Cookie
 		$this->data[$name] = $value;
 	}
 	
-	public function delete($name){
+	public function delete($name)
+	{
 		// If cookie exists
 		if($this->exists($name))
 		{
@@ -35,12 +38,14 @@ class Cookie
 		}
 	}
 	
-	public function read($name){
+	public function read($name)
+	{
 		// Decode and return Cookie data
 		return base64_decode($this->data[$name]);
 	}
 	
-	public function exists($name){
+	public function exists($name)
+	{
 		// Return if requested data exists
 		return array_key_exists($name, $this->data);
 	}

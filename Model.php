@@ -3,7 +3,7 @@
 namespace Core;
 
 # Model class
-class Model extends ActiveRecord\Model
+class Model extends \ActiveRecord\Model
 {
 	/**
 	 * Check if an attribute is valid on the current model and return a message with status info.

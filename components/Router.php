@@ -6,6 +6,7 @@ class Router
 {
 	private $request;
 	private $routes_file;
+	private $controller_class_name;
 	private $controller_name;
 	private $controller_action;
 	private $controller_arguments;
@@ -13,7 +14,7 @@ class Router
 	public function __construct(Request $request, $routes_file = 'routes')
 	{
 		$this->request     = $request;
-		$this->routes_file = DIR_CONFIG . $routes_file . '.php';
+		$this->routes_file = DIR . 'config/' . $routes_file . '.php';
 		
 		$this->processRoutes();
 	}
@@ -147,7 +148,7 @@ class Router
 				if(is_int($route_data[0]))
 				{
 					// Select match by integer and set controller
-					$this->controller = $matches[$route_data[0]];
+					$this->controller_name = $matches[$route_data[0]];
 					
 					// Unset the controller match
 					unset($matches[$route_data[0]]);
@@ -155,13 +156,13 @@ class Router
 				// If route controller is not an integer
 				else
 					// Set controller as route controller
-					$this->controller = $route_data[0];
+					$this->controller_name = $route_data[0];
 				
 				// If route action is integer
 				if(is_int($route_data[1]))
 				{
 					// Select match by integer and set action
-					$this->action = $matches[$route_data[1]];
+					$this->controller_action = $matches[$route_data[1]];
 					
 					// Unset the action match
 					unset($matches[$route_data[1]]);
@@ -170,13 +171,13 @@ class Router
 				// If route action is not an integer
 				else
 					// Set action as route action
-					$this->$action		=	$route_data[1];
+					$this->controller_action		=	$route_data[1];
 				
 				// Throw first match (complete string)
 				array_shift($matches);
 					
 				// Set matches caught as arguments
-				$this->arguments = $matches;
+				$this->controller_arguments = $matches;
 				
 				// Return true and stop searching
 				return true;

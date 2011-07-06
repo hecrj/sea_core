@@ -42,7 +42,7 @@ abstract class Controller {
 	public function init($action, $arguments)
 	{	
 		// Set view path
-		$this->view = $this->name . DIRECTORY_SEPARATOR . $action;
+		$this->view = array($this->name, $action);
 		
 		// Call before filter function
 		if(isset($this->before_filter))
@@ -105,6 +105,11 @@ abstract class Controller {
 			$this->callbacksFor($action, $this->after_filter);
 	}
 	
+	public function getName()
+	{
+		return $this->name;
+	}
+	
 	public function getLayout()
 	{
 		return $this->layout;
@@ -122,7 +127,7 @@ abstract class Controller {
 	
 	protected function setView($dir, $view)
 	{
-		$this->view = $dir . DIRECTORY_SEPARATOR . $view;
+		$this->view = array($dir, $view);
 	}
 	
 	private function callbacksFor($action, Array $callbacks){

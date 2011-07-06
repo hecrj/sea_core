@@ -13,11 +13,7 @@ class FrontController
 		
 		try
 		{
-			
-			// Constants needed first
-			require(DIR . 'core/Constants.php');
-		
-			// Autoload class
+			// Autoloader component
 			require(DIR . 'core/components/Autoloader.php');
 		
 			$loader = new $classes['Autoloader'];

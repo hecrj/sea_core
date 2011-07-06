@@ -16,6 +16,7 @@ class View
 	private $request;
 	private $controller;
 	private $injector;
+	private $path;
 	
 	/**
 	 * Constructs a view.
@@ -38,6 +39,9 @@ class View
 		
 		// Set helper injector
 		$this->injector = $injector;
+		
+		// Get view path info
+		$this->path = $this->controller->getView();
 	}
 	
 	public function init()
@@ -70,7 +74,7 @@ class View
 		$view = $this;
 		
 		// Set layout path
-		$layout_file = DIR_VIEWS . 'layouts/' . $this->controller->getLayout() . '.html.php';
+		$layout_file = DIR . 'app/views/layouts/' . $this->controller->getLayout() . '.html.php';
 		
 		// Exception if the layout doesn't exist
 		if(! is_file($layout_file))
@@ -107,7 +111,7 @@ class View
 		
 		// Normal view if it's empty
 		if(empty($partial))
-			$file = DIR_VIEWS . $this->controller->getView() .'.html.php';
+			$file = DIR . 'app/views/' . $this->path[0] .'/'. $this->path[1] .'.html.php';
 	
 		// Partial if it isn't empty
 		else
@@ -116,7 +120,7 @@ class View
 			list(/* EMPTY */, $path, $partial_name) = preg_split('/(.*\/)?([^\/]+)/', $partial, 0, PREG_SPLIT_DELIM_CAPTURE);
 		
 			// Set file path of partial: _partial_name
-			$file = DIR_VIEWS . $path . '_'.$partial_name . '.html.php';
+			$file = DIR . 'app/views/' . $path . '_'.$partial_name . '.html.php';
 		}
 				
 		// If cache is set
@@ -147,6 +151,14 @@ class View
 			// Render file
 			require($file);
 		}
+	}
+	
+	public function is($dir = null, $file = null)
+	{
+		$dir = (null === $dir or $dir == $this->path[0]);
+		$file = (null === $file or $file == $this->path[1]);
+		
+		return ($dir and $file);
 	}
 	
 	public function css_tag($path_file, $media = 'screen')
