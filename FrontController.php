@@ -63,7 +63,7 @@ class FrontController
 			ob_clean();
 			
 			// Require error page
-			if(! @include(DIR .'public/'. ($e->getCode() ? : '404') .'.php'))
+			if(! @include(DIR .'app/views/exceptions/'. ($e->getCode() ? : '404') .'.php'))
 				echo 'The requested '. $e->getCode() .' error page does not exist!<br />'.$e->getMessage();
 		}
 		
