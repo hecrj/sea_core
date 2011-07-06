@@ -59,7 +59,7 @@ abstract class Controller {
 		if(! $r->isPublic())
 			throw new \RuntimeException('The called action: <strong>'. $action .'</strong> is not public!');
 		
-		/*/ If access filter is defined
+		/*/ REFACTORING PENDING --> SECURITY COMPONENT IMPLEMENTATION
 		if($this->access_filter)
 		{
 			// Exception unless Auth class exists
