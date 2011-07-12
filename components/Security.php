@@ -30,12 +30,16 @@ class Security
 			// Save token
 			$session->write('csrf_token', $this->csrf_token);
 		}
-			
 	}
 	
 	public function getCSRFToken()
 	{
 		return $this->csrf_token;
+	}
+	
+	public function isCSRFToken($csrf_token)
+	{
+		return ($this->csrf_token == $csrf_token);
 	}
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Component;
+namespace Core\Components;
 
 ### Cookie component
 class Cookie
@@ -13,13 +13,13 @@ class Cookie
 		$this->data = $_COOKIE;
 	}
 	
-	public function create($name, $value, $time = 2592000, $path = '/')
+	public function create($name, $value, $time = 604800, $path = '/', $secure = false, $httponly = false)
 	{
 		// Encode value
-		$value = base64_encode($value);
+		$value = base64_encode(serialize($value));
 		
-		// Creaate cookie
-		setcookie($name, $value, time()+$time, $path, '.'.WEB_DOMAIN);
+		// Create cookie
+		setcookie($name, $value, $time ? time()+$time : 0, $path, '.'.WEB_DOMAIN, $secure, $httponly);
 		
 		// Add value to data
 		$this->data[$name] = $value;
@@ -41,7 +41,7 @@ class Cookie
 	public function read($name)
 	{
 		// Decode and return Cookie data
-		return base64_decode($this->data[$name]);
+		return unserialize(base64_decode($this->data[$name]));
 	}
 	
 	public function exists($name)

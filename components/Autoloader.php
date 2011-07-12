@@ -5,11 +5,14 @@ namespace Core\Components;
 # Autoloader class
 class Autoloader
 {
-	private $namespace = array();
+	private $namespaces = array();
 	
 	public function __construct()
+	{}
+	
+	public function register()
 	{
-		spl_autoload_register(array($this, 'load'));
+		spl_autoload_register(array($this, 'load'), true, true);
 	}	
 	
 	public function load($name)
@@ -37,24 +40,19 @@ class Autoloader
 	
 	public function set($namespace, $path)
 	{
-		$this->namespace[$namespace] = $path;
+		$this->namespaces[$namespace] = $path;
 	}
 	
-	public function vendor($path, $main, $config = null)
+	public function vendor($file, $path)
 	{
-		if(! is_file(DIR . 'vendor/'. $path .'/'. $main))
-			throw new \InvalidArgumentException('Vendor main file not found in: vendor/'. $path .'/'. $main);
+		if(! is_file(DIR . 'vendor/'. $path .'/'. $file .'.php'))
+			throw new \InvalidArgumentException('Vendor main file not found in: vendor/'. $path .'/'. $main.'.php');
 		
-		require(DIR . 'vendor/'. $path .'/'. $main);
+		require(DIR . 'vendor/'. $path .'/'. $file .'.php');
 		
-		if(! empty($config))
-		{
-			if(! is_file(DIR . 'config/'. $config))
-				throw new \InvalidArgumentException('Config vendor file not found in: config/'. $config);
-			
-			require(DIR . 'config/' . $config);
-		}
-		
+		if(is_file(DIR . 'config/vendor/'. $file .'.php'))
+			require(DIR . 'config/vendor/'. $file .'.php');
+				
 		return true;
 	}
 }

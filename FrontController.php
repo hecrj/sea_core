@@ -2,10 +2,18 @@
 
 namespace Core;
 
-### FrontController class
+/**
+ * FrontController class handles every request
+ * 
+ * @author HŽctor Ram—n JimŽnez
+ */
 class FrontController
 {
-	
+	/**
+	 * Creates basic application objects and starts application logic
+	 * 
+	 * @param array $classes Collection of classes
+	 */
 	public static function init(Array $classes)
 	{
 		// Start otuput buffering
@@ -13,6 +21,9 @@ class FrontController
 		
 		try
 		{
+			// Some utilities...
+			require(DIR . 'core/Functions.php');
+			
 			// Autoloader component
 			require(DIR . 'core/components/Autoloader.php');
 		
@@ -20,17 +31,19 @@ class FrontController
 		
 			// Application configuration
 			require(DIR . 'config/application.php');
-
-			// If orm has to be active
-			if(ORM_ACTIVE)
-				// Initialize ORM
-				$loader->vendor(ORM_PATH, ORM_MAIN_FILE, ORM_CONFIG_FILE);
+			
+			// Load vendors
+			foreach($vendors as $file => $path)
+				$loader->vendor($file, $path);
 			
 			// Boot initializing
 			require(DIR . 'config/boot.php');
 			
+			// Register autoloader
+			$loader->register();
+			
 			// New Request component from globals
-			$request = new $classes['Request']($_SERVER['HTTP_HOST'], $_SERVER['PATH_INFO'], $_SERVER['REQUEST_METHOD'], $_SERVER['HTTP_X_REQUESTED_WITH'], $_GET, $_POST, $_FILES);
+			$request = new $classes['Request']($_SERVER['HTTP_HOST'], $_SERVER['PATH_INFO'], $_SERVER['HTTPS'],	$_SERVER['REQUEST_METHOD'], $_SERVER['HTTP_X_REQUESTED_WITH'], $_GET, $_POST, $_FILES);
 			
 			// New Router component
 			$router = new $classes['Router']($request);

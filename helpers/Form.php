@@ -24,11 +24,6 @@ class Form
 		
 		// Set if the form has been posted
 		$this->posted = ($request->getMethod() == 'POST');
-		
-		// Set models defined as arguments of the constructor
-		if($models = func_get_args())
-			foreach($models as $model)
-				$this->models[] = $model;
 	}
 	
 	private function options_string($options, $custom)

@@ -4,19 +4,71 @@ namespace Core;
 use Core\Components\Router;
 use Core\Components\DynamicInjector;
 
-### Controller abstract class
+/**
+ * Abstract controller class to use as base for all application controllers.
+ * 
+ * A controller performs an action and stores the resulting data to use in
+ * the view.
+ *
+ * @author HŽctor Ram—n JimŽnez
+ */
 abstract class Controller {
 	
-	protected $router;
+	/**
+	 * Stores layout file name to load with the view
+	 *
+	 * @var string
+	 */
 	protected $layout = 'application';
+	
+	/**
+	 * Stores access filtering conditions using arrays.
+	 * If set to FALSE, access filtering will be disabled.
+	 *
+	 * @var mixed
+	 */
 	protected $access_filter = false;
+	
+	/**
+	 * Array with functions to call before the action is called.
+	 *
+	 * @var array
+	 */
 	protected $before_filter;
+	
+	/**
+	 * Array of functions to call after the action finishes.
+	 *
+	 * @var array
+	 */
 	protected $after_filter;
+	
+	/**
+	 * Stores controller name.
+	 *
+	 * @var string
+	 */
 	private $name;
+	
+	/**
+	 * Stores a component injector to inject dependencies to components dynamically.
+	 *
+	 * @var DynamicInjector
+	 */
 	private $injector;
-	private $view;
+	
+	/**
+	 * Stores action resulting data.
+	 *
+	 * @var array
+	 */
 	private $data = array();
     
+	/**
+	 * Creates a new controller.
+	 *
+	 * @param DynamicInjector $injector Dynamic component injector to use dependency injection.
+	 */
 	public function __construct(DynamicInjector $injector)
 	{	
 		$class_name = get_class($this);
@@ -24,29 +76,57 @@ abstract class Controller {
 		$this->injector = $injector;
 	}
 	
+	/**
+	 * Method to obtain a component.
+	 *
+	 * @param string $name Name of the component to obtain.
+	 * @return object Requested component.
+	 */
 	public function get($name)
 	{
 		return $this->injector->get($name);
 	}
-
+	
+	/**
+	 * Magic method to set data easily:
+	 * $this->foo = 'bar';
+	 *
+	 * @param string $key Name of the key to assign to the data
+	 * @param string $value Data value
+	 */
 	public function __set($key, $value)
 	{
 		$this->data[$key] = $value;
 	}
 	
+	/**
+	 * Magic method to get data easily:
+	 * $this->foo // returns 'bar'
+	 *
+	 * @param string $key Name of the key assigned to the data
+	 * @return multitype Data value:
+	 */
 	public function __get($key)
 	{
 		return $this->data[$key];
 	}
-			
+	
+	/**
+	 * Initializes the controller:
+	 * 1. Checks if the action can be called.
+	 * 2. Calls before filter functions defined in $before_filter
+	 * 3. Checks access authorization.
+	 * 4. Calls the action.
+	 * 5. Calls after filter functions defined in $after_filter
+	 *
+	 * @param string $action Name of the action to be called
+	 * @param array $arguments Array of arguments to pass to the action
+	 * @throws \RuntimeException
+	 */
 	public function init($action, $arguments)
 	{	
 		// Set view path
 		$this->view = array($this->name, $action);
-		
-		// Call before filter function
-		if(isset($this->before_filter))
-			$this->callbacksFor($action, $this->before_filter);
 		
 		// Exception if the action method doesn't exist --> Exception
 		if(! method_exists($this, $action))
@@ -59,6 +139,18 @@ abstract class Controller {
 		if(! $r->isPublic())
 			throw new \RuntimeException('The called action: <strong>'. $action .'</strong> is not public!');
 		
+		// Call before filter function
+		if(isset($this->before_filter))
+		$this->callbacksFor($action, $this->before_filter);
+		
+		if($this->access_filter)
+		{
+			
+			// Get authentication component with alias auth
+			$auth = $this->injector->get('auth');
+			
+			//...
+		}
 		/*/ REFACTORING PENDING --> SECURITY COMPONENT IMPLEMENTATION
 		if($this->access_filter)
 		{
@@ -105,31 +197,64 @@ abstract class Controller {
 			$this->callbacksFor($action, $this->after_filter);
 	}
 	
+	/**
+	 * Gets the name of the controller.
+	 * 
+	 * @return string Controller name
+	 */
 	public function getName()
 	{
 		return $this->name;
 	}
 	
+	/**
+	 * Gets the layout of the controller.
+	 * 
+	 * @return string Controller layout
+	 */
 	public function getLayout()
 	{
 		return $this->layout;
 	}
 	
+	/**
+	 * Gets the view of the controller.
+	 * 
+	 * @return array View data
+	 */
 	public function getView()
 	{
 		return $this->view;
 	}
 	
+	/**
+	 * Gets the stored data in the controller.
+	 * 
+	 * @return array Data stored in the controller
+	 */
 	public function getData()
 	{
 		return $this->data;
 	}
 	
+	/**
+	 * Sets a view.
+	 *
+	 * @param string $dir Directory in app/views/ where the view is
+	 * @param string $view Name of the view to load
+	 */
 	protected function setView($dir, $view)
 	{
 		$this->view = array($dir, $view);
 	}
 	
+	/**
+	 * Calls $callbacks functions if key matches with the action or if it
+	 * is an integer (non related to an action).
+	 *
+	 * @param string $action Action to match the callback with
+	 * @param array $callbacks Array of callback functions to be called
+	 */
 	private function callbacksFor($action, Array $callbacks){
 		foreach($callbacks as $key => $value)
 		{
@@ -142,5 +267,3 @@ abstract class Controller {
 	}
 	
 }
-
-?>

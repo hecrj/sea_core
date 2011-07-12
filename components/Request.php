@@ -5,14 +5,17 @@ namespace Core\Components;
 ### Request component
 class Request
 {
-	public  $params = array();
+	public $get = array();
+	public $post = array();
+	public $files = array();
 	private $subdomain = 'www';
 	private $hostname;
 	private $route;
+	private $ssl;
 	private $method;
 	private $ajax;
 	
-	public function __construct($host = 'localhost', $route = '/', $method = 'GET', $requester = null, Array $get = null, Array $post = null, Array $files = null)
+	public function __construct($host = 'localhost', $route = '/', $ssl = null, $method = 'GET', $requester = null, Array $get = null, Array $post = null, Array $files = null)
 	{	
 		// Explode host
 		$host_parts = explode('.', $host);
@@ -32,8 +35,11 @@ class Request
 		
 		$this->route  = $route;
 		$this->method = $method;
+		$this->ssl    = !empty($ssl);
 		$this->ajax   = (!is_null($requester) && $requester == 'XMLHttpRequest');
-		$this->params = array_merge((array)$get, (array)$post, (array)$files);
+		$this->get    = (array)$get;
+		$this->post   = (array)$post;
+		$this->files  = (array)$files;
 	}
 	
 	public function getSubdomain()
@@ -54,6 +60,11 @@ class Request
 	public function getMethod()
 	{
 		return $this->method;
+	}
+	
+	public function isSSL()
+	{
+		return $this->ssl;
 	}
 	
 	public function isAjax()
