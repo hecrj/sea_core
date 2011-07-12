@@ -10,7 +10,7 @@ use Core\Components\DynamicInjector;
  * A controller performs an action and stores the resulting data to use in
  * the view.
  *
- * @author Héctor Ramón Jiménez
+ * @author H√©ctor Ram√≥n Jim√©nez
  */
 abstract class Controller {
 	

@@ -5,7 +5,7 @@ namespace Core;
 /**
  * FrontController class handles every request
  * 
- * @author Héctor Ramón Jiménez
+ * @author H√©ctor Ram√≥n Jim√©nez
  */
 class FrontController
 {
