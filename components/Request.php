@@ -2,59 +2,41 @@
 
 namespace Core\Components;
 
-### Request component
+/**
+ * Request class represents an HTTP/S request.
+ * 
+ * @author Héctor Ramón Jiménez
+ */
 class Request
 {
+
 	public $get = array();
 	public $post = array();
 	public $files = array();
-	private $subdomain = 'www';
-	private $hostname;
-	private $route;
-	private $ssl;
 	private $method;
+	private $ssl;
 	private $ajax;
 	
-	public function __construct($host = 'localhost', $route = '/', $ssl = null, $method = 'GET', $requester = null, Array $get = null, Array $post = null, Array $files = null)
+    /**
+     * Request constructor.
+     *
+     * @param string $host
+     * @param string $route
+     * @param string $ssl
+     * @param string $method
+     * @param string $type
+     * @param array $get
+     * @param array $post
+     * @param array $files 
+     */
+	public function __construct($method = 'GET', $ssl = null, $type = null, Array $get = null, Array $post = null, Array $files = null)
 	{	
-		// Explode host
-		$host_parts = explode('.', $host);
-		
-		// If host has 3 or more parts has a subdomain
-		if(count($host_parts) > 2)
-		{
-			// Set subdomain
-			$this->subdomain = $host_parts[0];
-			
-			// Set hostname
-			$this->hostname  = $host_parts[1];
-		}
-		else
-			// Set hostname
-			$this->hostname  = $host_parts[0];
-		
-		$this->route  = $route;
 		$this->method = $method;
 		$this->ssl    = !empty($ssl);
-		$this->ajax   = (!is_null($requester) && $requester == 'XMLHttpRequest');
+		$this->ajax   = (bool)($type == 'XMLHttpRequest');
 		$this->get    = (array)$get;
 		$this->post   = (array)$post;
 		$this->files  = (array)$files;
-	}
-	
-	public function getSubdomain()
-	{
-		return $this->subdomain;
-	}
-	
-	public function getHostname()
-	{
-		return $this->hostname;
-	}
-	
-	public function getRoute()
-	{
-		return $this->route;
 	}
 	
 	public function getMethod()
@@ -72,10 +54,6 @@ class Request
 		return $this->ajax;
 	}
 	
-	public function redirect($path, $flash = false){
-		header('Location: ' . $path);
-		exit();
-	}
 }
 
 ?>

@@ -20,6 +20,11 @@ abstract class DynamicInjector
 	{
 		$this->instances[$name] = $instance;
 	}
+    
+    public function getClassName($name)
+    {
+        return $this->classes[$name];
+    }
 	
 	public function get($name)
 	{

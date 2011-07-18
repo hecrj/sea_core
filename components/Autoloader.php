@@ -10,9 +10,9 @@ class Autoloader
 	public function __construct()
 	{}
 	
-	public function register()
+	public function register($prepend = true)
 	{
-		spl_autoload_register(array($this, 'load'), true, true);
+		spl_autoload_register(array($this, 'load'), true, false);
 	}	
 	
 	public function load($name)
