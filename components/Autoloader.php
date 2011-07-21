@@ -46,7 +46,7 @@ class Autoloader
 	public function vendor($file, $path)
 	{
 		if(! is_file(DIR . 'vendor/'. $path .'/'. $file .'.php'))
-			throw new \InvalidArgumentException('Vendor main file not found in: vendor/'. $path .'/'. $main.'.php');
+			throw new \InvalidArgumentException('Vendor main file not found in: vendor/'. $path .'/'. $file.'.php');
 		
 		require(DIR . 'vendor/'. $path .'/'. $file .'.php');
 		

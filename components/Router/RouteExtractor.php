@@ -32,8 +32,8 @@ class RouteExtractor extends Analyzer
 			$this->controllerName = $rules['static_controller'];
 		
 		else
-			throw new \RuntimeException('Undefined default controller. Check
-				your routing configuration.');
+			throw new \RuntimeException('Undefined default controller for the
+				current subdomain. Check your routing configuration.', 404);
 	}
 	
 	private function extractFromArguments($controllerAttr)

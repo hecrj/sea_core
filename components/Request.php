@@ -30,7 +30,7 @@ class Request
      * @param array $files 
      */
 	public function __construct($method = 'GET', $ssl = null, $type = null, Array $get = null, Array $post = null, Array $files = null)
-	{	
+	{
 		$this->method = $method;
 		$this->ssl    = !empty($ssl);
 		$this->ajax   = (bool)($type == 'XMLHttpRequest');
