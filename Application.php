@@ -72,7 +72,7 @@ class Application
 		$this->request = new $this->classes['Request']($_SERVER['REQUEST_METHOD'], $_SERVER['HTTPS'],
 				$_SERVER['HTTP_X_REQUESTED_WITH'], $_GET, $_POST, $_FILES);
 		
-		$this->componentInjector->set('request', $request);
+		$this->componentInjector->set('request', $this->request);
 	}
 	
 	private function initRouter()
