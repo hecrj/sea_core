@@ -65,10 +65,10 @@ class Form
 				if(is_object($model->errors))
 				{
 					if($model->errors->is_empty())
-						return null;
+						return $this;
 				}
 				elseif($model->is_valid())
-					return null;
+					return $this;
 
 				$errors = '                    <div class="message error">
 		            <h3>Some errors have ocurred:</h3>
