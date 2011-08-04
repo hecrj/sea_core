@@ -103,7 +103,7 @@ class Form
 		
 		$options = $this->options_string($options, $custom);
 		
-		$input = '<input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . (($this->model) ? ' value="' . htmlentities($this->model->$name) . '"' : '') .' />';
+		$input = '<input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . (($this->model) ? ' value="' . htmlspecialchars($this->model->$name) . '"' : '') .' />';
 		
 		if($label)
 			$this->label($label, $name, $input);
@@ -119,7 +119,7 @@ class Form
 		
 		$options = $this->options_string($options, $custom);
 		
-		$textarea = '<textarea name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . '>'. (($this->model) ? htmlentities($this->model->$name) : '') . '</textarea>';
+		$textarea = '<textarea name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . '>'. (($this->model) ? htmlspecialchars($this->model->$name) : '') . '</textarea>';
 		
 		if($label)
 			$this->label($label, $name, $textarea);
