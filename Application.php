@@ -13,8 +13,8 @@ class Application
 	private $autoloader;
 	private $request;
 	private $route;
-	private $router;
 	private $componentInjector;
+	private $router;
 	private $controller;
 	private $view;
 	
@@ -67,19 +67,18 @@ class Application
 	}
 	
 	private function initBasicComponents()
-	{
-		$this->componentInjector = new $this->classes['ComponentInjector'];
+	{	
 		$this->request = new $this->classes['Request']($_SERVER['REQUEST_METHOD'], $_SERVER['HTTPS'],
 				$_SERVER['HTTP_X_REQUESTED_WITH'], $_GET, $_POST, $_FILES);
+		$this->route = new $this->classes['Route']($_SERVER['HTTPS'], $_SERVER['HTTP_HOST'], $_SERVER['PATH_INFO']);
 		
+		$this->componentInjector = new $this->classes['ComponentInjector'];
 		$this->componentInjector->set('request', $this->request);
+		$this->componentInjector->set('route', $this->route);
 	}
 	
 	private function initRouter()
-	{
-		$this->route = new $this->classes['Route']($_SERVER['HTTPS'],
-				$_SERVER['HTTP_HOST'], $_SERVER['PATH_INFO']);
-		
+	{	
 		require(DIR . 'config/routes.php');
 		$matcher = new $this->classes['RouteMatcher']($routeRules);
 		$extractor = new $this->classes['RouteExtractor']($routeRules);

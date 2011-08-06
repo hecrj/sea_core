@@ -107,6 +107,9 @@ class Cache
 			// Set file path
 			$file_path = $dir_path .'/'. $file .'.cache';
 			
+			if(! is_file($file_path))
+				return false;
+			
 			// Exception if delete cache file fails
 			if(! @unlink($file_path))
 				throw new \RuntimeException('Impossible delete file: <strong>'. $file_path .'</strong>');
@@ -117,7 +120,7 @@ class Cache
 			// Clean directory recursively
 			$this->cleanDir($dir_path);
 			
-		return $this;
+		return true;
 	}
 	
 	private function cleanDir($dir_path, $delete = false)

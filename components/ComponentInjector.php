@@ -11,6 +11,7 @@ class ComponentInjector extends DynamicInjector
 		'cache'			=>	'Core\\Components\\Cache',
 		'cookie'		=>	'Core\\Components\\Cookie',
 		'request'		=>	'Core\\Components\\Request',
+		'route'			=>	'Core\\Components\\Router\\Route',
 		'security'		=>	'Core\\Components\\Security',
 		'session'		=>	'Core\\Components\\Session',
 		'pagination'	=>	'Core\\Components\\Pagination'
@@ -20,10 +21,10 @@ class ComponentInjector extends DynamicInjector
 		'auth'			=>	array('session', 'cookie'),
 		'security'		=>	array('session', 'request'),
 		'session'		=>	array('cookie', 'request'),
-		'pagination'	=>	array('request')
+		'pagination'	=>	array('route')
 	);
 	
-	protected $shared = array('auth', 'cookie', 'request', 'session', 'security');
+	protected $shared = array('auth', 'cookie', 'request', 'route', 'session', 'security');
 }
 
 ?>

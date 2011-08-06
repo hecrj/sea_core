@@ -21,10 +21,6 @@ class View
 	/**
 	 * Constructs a view.
 	 *
-	 * When controller action, called by FrontController, has been finished, a View is instantiated.
-	 * Then @param $data, which contains all data necessary for View, is passed to the constructor by
-	 * Controller and it's assigned to @var $data in View object.
-	 *
 	 * @param object $request       Core\Components\Request    A request object
 	 * @param object $controller    Core\Controller            A controller object
 	 * @return View
