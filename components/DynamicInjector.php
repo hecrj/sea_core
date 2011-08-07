@@ -37,22 +37,6 @@ abstract class DynamicInjector
 		return $this->saveInstance($name, $this->inject($this->classes[$name], $this->dependencies[$name]));
 	}
 	
-	private function getDependency($name)
-	{
-		if(isset($this->instances[$name]))
-			return $this->instances[$name];
-		
-		if(!isset($this->classes[$name]))
-		{
-			if(null !== $this->injector)
-				return $this->injector->get($name);
-			else
-				throw new \RuntimeException('Dependency not present in classes list or in instances of the injector: '. $name .'. Check your class: '. get_class($this));
-		}
-		
-		return $this->saveInstance($name, $this->inject($this->classes[$name], $this->dependencies[$name]));
-	}
-	
 	private function saveInstance($name, $instance)
 	{
 		if($this->shared !== FALSE and ($this->shared === TRUE or in_array($name, $this->shared)))
@@ -90,6 +74,22 @@ abstract class DynamicInjector
 		}
 		
 		return $instance;
+	}
+	
+	private function getDependency($name)
+	{
+		if(isset($this->instances[$name]))
+			return $this->instances[$name];
+		
+		if(!isset($this->classes[$name]))
+		{
+			if(null !== $this->injector)
+				return $this->injector->get($name);
+			else
+				throw new \RuntimeException('Dependency not present in classes list or in instances of the injector: '. $name .'. Check your class: '. get_class($this));
+		}
+		
+		return $this->saveInstance($name, $this->inject($this->classes[$name], $this->dependencies[$name]));
 	}
 }
 

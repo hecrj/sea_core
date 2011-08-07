@@ -8,6 +8,8 @@ class Route
 	private $subdomain = 'www';
 	private $hostname;
 	private $path;
+	private $page = 1;
+	private $pageFormat = 'page-';
 
 	public function __construct($ssl = null, $host = 'localhost', $path = '/')
 	{
@@ -34,6 +36,21 @@ class Route
 			$this->hostname  = $host_parts[0];
 	}
 	
+	public function setPath($path)
+	{
+		$this->path = $path;
+	}
+	
+	public function setPage($page)
+	{
+		$this->page = (int)$page;
+	}
+	
+	public function setPageFormat($format)
+	{
+		$this->pageFormat = $format;
+	}
+	
 	public function getProtocol()
 	{
 		return $this->protocol;
@@ -52,6 +69,16 @@ class Route
 	public function getPath()
 	{
 		return $this->path;
+	}
+	
+	public function getPage()
+	{
+		return $this->page;
+	}
+	
+	public function getPageFormat()
+	{
+		return $this->pageFormat;
 	}
 	
 	public function __toString()

@@ -2,26 +2,39 @@
 
 namespace Core\Components\Router;
 
-use Core\Components\Request;
-
 class Router
 {
-	private $matcher;
-	private $extractor;
+	private $rules;
+	private $analyzers = array();
 	
-	public function __construct(Analyzer $matcher, Analyzer $extractor)
+	public function __construct(Array $routeRules)
 	{
-		$this->matcher = $matcher;
-		$this->extractor = $extractor;
+		$this->rules = $routeRules;
+	}
+	
+	public function addAnalyzer(Analyzer $analyzer)
+	{
+		$this->analyzers[] = $analyzer;
 	}
 
 	public function getControllerDataFrom(Route $route)
-	{	
-		if($this->matcher->analyze($route))
-			return $this->matcher->getControllerData();
+	{
+		$rules = $this->getRulesFor($route);
 		
-		$this->extractor->analyze($route);
-		return $this->extractor->getControllerData();
+		foreach($this->analyzers as $analyzer)
+			if($analyzer->analyze($route, $rules))
+				return $analyzer->getControllerData();
+	}
+	
+	private function getRulesFor($route)
+	{
+		$subdomain = $route->getSubdomain();
+		
+		if(!isset($this->rules[$subdomain]))
+			throw new \RuntimeException('Enrouting rules are not defined for
+				subdomain: <strong>' . $subdomain . '</strong>', 404);
+		
+		return $this->rules[$subdomain];
 	}
 
 }

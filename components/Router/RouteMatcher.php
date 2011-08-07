@@ -4,10 +4,8 @@ namespace Core\Components\Router;
 
 class RouteMatcher extends Analyzer
 {	
-	public function analyze(Route $route)
-	{
-		$rules = $this->getRulesFor($route);
-		
+	public function analyze(Route $route, Array $rules)
+	{	
 		if(! is_array($rules['routes']))
 			return false;
 		

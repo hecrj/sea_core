@@ -151,30 +151,20 @@ abstract class Controller {
 			
 			//...
 		}
-		/*/ REFACTORING PENDING --> SECURITY COMPONENT IMPLEMENTATION
-		if($this->access_filter)
-		{
-			// Exception unless Auth class exists
-			ExceptionUnless(is_a(Auth::$user, 'UserBase'), 'Native access filtering needs an Auth component class with static $user property having an UserBase based model as content.');
-			
-			// Set group or role to check. If is not defined, use '*' as key for default access filtering
-			$group_role = (isset($this->access_filter[$action])) ? $this->access_filter[$action] : $this->access_filter['*'];
-			
-			// If group role is not false
-			if($group_role)
-				// 403 if current user cannot access to current action
-				ExceptionUnless(Auth::$user->is($group_role), 'Sorry, but you don\'t have enough privilegies to access this page.', 403);
-		}*/
 		
-		// Get number of required parameters
-		$num_params	= $r->getNumberOfRequiredParameters();
+		$num_params = $r->getNumberOfParameters();
+		$num_req_params	= $r->getNumberOfRequiredParameters();
 		
 		// Get number of args
 		$num_args	= count($arguments);
 		
 		// If there are more required parameters than args
-		if($num_params > $num_args)
-			$num_args = $num_params;
+		if($num_req_params > $num_args)
+			$num_args = $num_req_params;
+		
+		elseif($num_params < $num_args)
+			throw new \RuntimeException('There are too much arguments in the route for the action <strong>'. $action .
+					'</strong> in <strong>'. get_class($this) . '</strong>');
 		
 		// Switch to avoid call_user_func_array depending the number of args
 		switch ($num_args)

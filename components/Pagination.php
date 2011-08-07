@@ -1,31 +1,23 @@
 <?php
 
 namespace Core\Components;
-use Core\Components\Request;
+use Core\Components\Router\Route;
 
 # Pagination helper
 class Pagination
 {
-	private $request;
 	private $model;
 	private $limit = 10;
 	private $conditions = array();
-	private $order = 'id DESC';
-	private $format = 'page-';
+	private $order = 'id ASC';
 	private $actual_page;
 	private $total_pages;
 	private $path;
 	
 	public function __construct(Route $route)
 	{
-		$this->path = '/'. $route->getPath() ?: 'index/';
-		
-		if(substr($this->path, 0, -1) != '/')
-			$this->path = $this->path . '/';
-		
-		preg_match('/'.$this->format.'([0-9]+)\/$/', $this->path, $matches);
-		
-		$this->actual_page = (int)$matches[1];
+		$this->path = '/' . $route->getPath() . $route->getPageFormat();
+		$this->actual_page = $route->getPage();
 	}
 	
 	public function model($model)
@@ -60,6 +52,8 @@ class Pagination
 	public function page($page)
 	{
 		$this->actual_page = (int)$page;
+		
+		return $this;
 	}
 	
 	public function getResults()
@@ -69,6 +63,9 @@ class Pagination
 			'select'		=> 'id',
 			'conditions' 	=> $this->conditions
 		);
+		
+		// Set model var for parsing reasons
+		$model = $this->model;
 		
 		// Calculate total pages
 		$this->total_pages = ceil( count( $model::all($count_options) ) / $this->limit );
@@ -80,9 +77,6 @@ class Pagination
 		
 		// Calculate offset
 		$offset = ($this->actual_page - 1) * $this->limit;
-		
-		// Set model var for parsing reasons
-		$model = $this->model;
 		
 		// Return results
 		return $model::all(array(
@@ -104,12 +98,9 @@ class Pagination
 	}
 	
 	public function render(Array $custom = null)
-	{
-		// Delete format from route
-		$this->path = str_replace($this->format . $this->actual_page .'/', '', $this->path);
-		
+	{	
 		// Default options hash
-		$options = array('ajax' => false);
+		$options = array('ajax' => false, 'previous' => '&laquo; Previous', 'next' => 'Next &raquo');
 		
 		// If custom options are set
 		if($custom)
@@ -122,13 +113,13 @@ class Pagination
 		// If the actual page isn't 1
 		if($this->actual_page != 1)
 			// Print link to previous page
-			echo '                    <a href="' . $this->path . $this->format . ($this->actual_page - 1) . '">&laquo; Previous</a>'."\n";
+			echo '                    <a href="' . $this->path . ($this->actual_page - 1) . '">'. $options['previous'] .'</a>'."\n";
 		
 		// If no page limit is set
 		if(!isset($options['pages']))
 			// Show all the pages
 			for($page = 1; $this->total_pages >= $page; $page ++)
-				echo '                    <a href="' . $this->path . $this->format . $page . '"' . (($this->actual_page == $page) ? ' class="active"' : '') . '>' . $page . '</a>'."\n";
+				echo '                    <a href="' . $this->path . $page . '"' . (($this->actual_page == $page) ? ' class="active"' : '') . '>' . $page . '</a>'."\n";
 		
 		// If page limit is set
 		else
@@ -150,13 +141,13 @@ class Pagination
 			
 			$this->render_previous_pages($previous_pages);
 			
-			echo '                    <a href="' . $this->path . $this->format . $this->actual_page . '" class="active">' . $this->actual_page . '</a>'."\n";
+			echo '                    <a href="' . $this->path . $this->actual_page . '" class="active">' . $this->actual_page . '</a>'."\n";
 			
 			$this->render_next_pages($next_pages);
 		}
 			
 		if($this->actual_page != $this->total_pages)
-			echo '                    <a href="' . $this->path . $this->format . ($this->actual_page + 1) . '">Next &raquo;</a>'."\n";
+			echo '                    <a href="' . $this->path . ($this->actual_page + 1) . '">'. $options['next'] .'</a>'."\n";
 		
 		echo '                </div>'."\n";
 	}
@@ -166,7 +157,7 @@ class Pagination
 		$pages_diff = $this->actual_page - $pages;
 		
 		for($page = $this->actual_page - 1; $page > 0 and $page >= $pages_diff; $page --)
-			$previous_pages = '                    <a href="' . $this->path . $this->format . $page . '">' . $page . '</a>'."\n" . $previous_pages;
+			$previous_pages = '                    <a href="' . $this->path . $page . '">' . $page . '</a>'."\n" . $previous_pages;
 			
 		echo $previous_pages;
 	}
@@ -176,7 +167,7 @@ class Pagination
 		$pages_diff = $this->actual_page + $pages;
 		
 		for($page = $this->actual_page + 1; $page <= $this->total_pages and $page <= $pages_diff; $page ++)
-			echo '                    <a href="' . $this->path . $this->format . $page . '">' . $page . '</a>'."\n";
+			echo '                    <a href="' . $this->path . $page . '">' . $page . '</a>'."\n";
 	}
 	
 }

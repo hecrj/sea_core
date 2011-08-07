@@ -4,21 +4,43 @@ namespace Core\Components\Router;
 
 class RouteExtractor extends Analyzer
 {
-	private $controllerNameDefault;
+	private $controllerNameDefault = 'index';
 	private $controllerActionDefault = 'index';
 	
-	public function analyze(Route $route)
-	{
-		$rules = $this->getRulesFor($route);
-		
+	public function analyze(Route $route, Array $rules)
+	{	
+		$this->cleanRoutePath($route, $rules);
 		$this->setControllerArgumentsAsRouteParts($route);
 		$this->extractControllerNameFromArgumentsUsing($rules);
 		$this->extractFromArguments('controllerAction');
+		
+		return true;
+	}
+	
+	public function cleanRoutePath($route, $rules)
+	{
+		$path = $route->getPath();
+		$format = $rules['page_format'] ?: $route->getPageFormat();
+		$pattern = '/'. $format .'([0-9]+)\/?/';
+		
+		if(preg_match($pattern, $path, $matches))
+		{
+			$route->setPage($matches[1]);
+			$route->setPageFormat($format);
+			
+			$cleanPath = preg_replace($pattern, '', $path);
+			$route->setPath($cleanPath);
+		}
 	}
 	
 	private function setControllerArgumentsAsRouteParts($route)
 	{
-		$this->controllerArguments = explode('/', $route->getPath());
+		$path = $route->getPath();
+		
+		if(substr($path, -1) == '/')
+			$path = substr($path, 0, -1);
+		
+		$this->controllerArguments = explode('/', $path);
 	}
 	
 	private function extractControllerNameFromArgumentsUsing($rules)
@@ -30,10 +52,6 @@ class RouteExtractor extends Analyzer
 		}
 		elseif(isset($rules['static_controller']))
 			$this->controllerName = $rules['static_controller'];
-		
-		else
-			throw new \RuntimeException('Undefined default controller for the
-				current subdomain. Check your routing configuration.', 404);
 	}
 	
 	private function extractFromArguments($controllerAttr)

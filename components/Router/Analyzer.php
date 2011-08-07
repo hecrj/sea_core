@@ -4,28 +4,13 @@ namespace Core\Components\Router;
 
 abstract class Analyzer
 {
-	protected $rules;
 	protected $controllerName;
 	protected $controllerAction;
 	protected $controllerArguments;
 	
-	public function __construct(Array $rules)
-	{
-		$this->rules = $rules;
-	}
+	public function __construct(){}
 	
-	abstract public function analyze(Route $route);
-	
-	final protected function getRulesFor(Route $route)
-	{
-		$subdomain = $route->getSubdomain();
-		
-		if(!isset($this->rules[$subdomain]))
-			throw new \RuntimeException('Enrouting rules are not defined for
-				subdomain: <strong>' . $subdomain . '</strong>', 404);
-		
-		return $this->rules[$subdomain];
-	}
+	abstract public function analyze(Route $route, Array $rules);
 	
 	final public function getControllerData()
 	{

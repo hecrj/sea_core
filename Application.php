@@ -79,11 +79,13 @@ class Application
 	
 	private function initRouter()
 	{	
-		require(DIR . 'config/routes.php');
-		$matcher = new $this->classes['RouteMatcher']($routeRules);
-		$extractor = new $this->classes['RouteExtractor']($routeRules);
+		$matcher = new $this->classes['RouteMatcher'];
+		$extractor = new $this->classes['RouteExtractor'];
 		
-		$this->router = new $this->classes['Router']($matcher, $extractor);
+		require(DIR . 'config/routes.php');
+		$this->router = new $this->classes['Router']($routeRules);
+		$this->router->addAnalyzer($matcher);
+		$this->router->addAnalyzer($extractor);
 	}
 	
 	private function initController()
