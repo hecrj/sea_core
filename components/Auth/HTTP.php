@@ -50,7 +50,7 @@ class HTTP extends ProtocolAbstract
 	{
 		$this->sessionCreate($user);
 		
-		if($user->getRemember())
+		if($user->remember)
 			$this->cookieCreate($user, $this->cookie_time);
 		
 		$this->user = $user;

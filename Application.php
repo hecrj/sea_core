@@ -36,6 +36,7 @@ class Application
 		{
 			$this->initAutoloader();
 			$this->initBasicComponents();
+			$this->initConstants();
 			$this->initRouter();
 			$this->initController();
 			$this->initView();
@@ -77,6 +78,17 @@ class Application
 		$this->componentInjector->set('route', $this->route);
 	}
 	
+	private function initConstants()
+	{
+		if($this->request->isSSL())
+			$httpUrl = 'http://www.'. WEB_DOMAIN;
+		else
+			$httpsUrl = 'https://www.'. WEB_DOMAIN;
+		
+		define('HTTP_URL', $httpUrl);
+		define('HTTPS_URL', $httpsUrl);
+	}
+	
 	private function initRouter()
 	{	
 		$matcher = new $this->classes['RouteMatcher'];
@@ -93,23 +105,20 @@ class Application
 		list($controllerName, $controllerAction,
 			$controllerArguments) = $this->router->getControllerDataFrom($this->route);
 		
-		$controllerClassName = $this->getControllerClassName($controllerName);
-		$this->controller = new $controllerClassName($this->componentInjector);
+		$controllerBaseClass = $this->classes['Controller'];
+		$controllerClassName = $controllerBaseClass::getControllerClassName($controllerName);
 		
+		$this->controller = new $controllerClassName($this->componentInjector);
 		$this->controller->init($controllerAction, $controllerArguments);
 	}
 	
 	private function initView()
 	{
-		$this->view = new $this->classes['View']($this->request, $this->controller,
-				new $this->classes['HelperInjector']($this->componentInjector));
+		$helperInjector = new $this->classes['HelperInjector']($this->componentInjector);
+		$helperInjector->set('componentInjector', $this->componentInjector);
 		
-		$this->view->init();
-	}
-	
-	private function getControllerClassName($controllerName)
-	{
-		return 'App\\Controllers\\' . ucwords($controllerName) . 'Controller';
+		$this->view = new $this->classes['View']($this->controller, $helperInjector);
+		$this->view->init($this->request->isAjax());
 	}
 	
 }

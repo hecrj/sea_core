@@ -15,24 +15,28 @@ abstract class ProtocolAbstract
 	protected $session_time = 86400;
 	protected $session_time_active = 900;
 	protected $cookie_time = 604800;
-	private $initialized = false;
 	
 	public function __construct(Session $session, Cookie $cookie)
 	{
 		$this->session = $session;
 		$this->cookie  = $cookie;
 		$this->secure  = $session->isSecure();
+		
+		$this->init();
+	}
+	
+	public function isSecure()
+	{
+		return $this->secure;
 	}
 	
 	public function logout($cookie = 'user_data')
 	{
-		// Destroy current session
+		if($this->user == null)
+			return false;
+		
 		$this->session->destroy(true);
-		
-		// Delete cookie
 		$this->cookie->delete($cookie);
-		
-		// Unset user
 		$this->user = null;
 		
 		return true;
@@ -44,10 +48,7 @@ abstract class ProtocolAbstract
 	}
 	
 	final public function getUser()
-	{
-		if($this->user == null and !$this->initialized)
-			$this->initialized = $this->init();
-		
+	{	
 		return $this->user;
 	}
 	

@@ -7,14 +7,16 @@ class HelperInjector extends DynamicInjector
 {
 	
 	protected $classes = array(
-		'form'			=>	'Core\\Helpers\\Form'
+		'componentInjector'	=>	'Core\\Components\\ComponentInjector',
+		'form'				=>	'Core\\Helpers\\Form',
+		'javascript'		=>	'Core\\Helpers\\Javascript'
 	);
 
 	protected $dependencies = array(	
 		'form'			=>	array('security', 'request')
 	);
 	
-	protected $shared = false;
+	protected $shared = array('javascript');
 	
 }
 

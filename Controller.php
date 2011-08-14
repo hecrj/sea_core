@@ -111,54 +111,56 @@ abstract class Controller {
 		return $this->data[$key];
 	}
 	
-	/**
-	 * Initializes the controller:
-	 * 1. Checks if the action can be called.
-	 * 2. Calls before filter functions defined in $before_filter
-	 * 3. Checks access authorization.
-	 * 4. Calls the action.
-	 * 5. Calls after filter functions defined in $after_filter
-	 *
-	 * @param string $action Name of the action to be called
-	 * @param array $arguments Array of arguments to pass to the action
-	 * @throws \RuntimeException
-	 */
-	public function init($action, $arguments)
-	{	
-		// Set view path
-		$this->view = array($this->name, $action);
+	public function init($action, Array $arguments)
+	{
+		$reflection = new \ReflectionMethod($this, $action);
 		
-		// Exception if the action method doesn't exist --> Exception
-		if(! method_exists($this, $action))
-			throw new \RuntimeException('The called action: <strong>'. $action .'</strong> does not exist in '. get_class($this) .'!');
-			
-		// Reflection to check type of method
-		$r = new \ReflectionMethod($this, $action);
-		
-		//  Exception if the method isn't public --> Exception
-		if(! $r->isPublic())
+		if($reflection->isPublic())
+			$this->call($reflection, $arguments);
+		else
 			throw new \RuntimeException('The called action: <strong>'. $action .'</strong> is not public!');
 		
-		// Call before filter function
-		if(isset($this->before_filter))
-		$this->callbacksFor($action, $this->before_filter);
+	}
+	
+	public function initBlock($action, Array $arguments)
+	{
+		$reflection = new \ReflectionMethod($this, $action);
 		
-		if($this->access_filter)
-		{
-			
-			// Get authentication component with alias auth
-			$auth = $this->injector->get('auth');
-			
-			//...
-		}
+		if($reflection->isPublic() or $reflection->isProtected())
+			$this->call($reflection, $arguments);
+		else
+			throw new \RuntimeException('The called block action: <strong>'. $action .'</strong> is not public or protected!');
+	}
+	
+	private function call($reflection, $arguments)
+	{	
+		$action = $reflection->name;
 		
-		$num_params = $r->getNumberOfParameters();
-		$num_req_params	= $r->getNumberOfRequiredParameters();
+		$this->data['view'] = $this->name .'/'. $action;
 		
-		// Get number of args
-		$num_args	= count($arguments);
+		if($this->before_filter)
+			$this->callbacksFor($action, $this->before_filter);
 		
-		// If there are more required parameters than args
+		// if($this->access_filter)
+			// ...
+		
+		$actionData = $this->callAction($reflection, $arguments);
+		
+		if(is_array($actionData))
+			$this->data = $actionData;
+		
+		if($this->after_filter)
+			$this->callbacksFor($action, $this->after_filter);
+	}
+	
+	private function callAction($reflection, $arguments)
+	{
+		$action = $reflection->name;
+		$num_params = $reflection->getNumberOfParameters();
+		$num_req_params	= $reflection->getNumberOfRequiredParameters();
+		
+		$num_args = count($arguments);
+		
 		if($num_req_params > $num_args)
 			$num_args = $num_req_params;
 		
@@ -166,7 +168,7 @@ abstract class Controller {
 			throw new \RuntimeException('There are too much arguments in the route for the action <strong>'. $action .
 					'</strong> in <strong>'. get_class($this) . '</strong>');
 		
-		// Switch to avoid call_user_func_array depending the number of args
+		// Switch to avoid call_user_func_array
 		switch ($num_args)
 		{
 		    case 0: return $this->$action(); break;
@@ -181,10 +183,6 @@ abstract class Controller {
 		    case 9: return $this->$action($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5], $arguments[6], $arguments[7], $arguments[8]); break;
 		    default: return call_user_func_array(array($this, $action), $arguments);
 		}
-		
-		// Call after filter action
-		if($this->after_filter)
-			$this->callbacksFor($action, $this->after_filter);
 	}
 	
 	/**
@@ -214,7 +212,7 @@ abstract class Controller {
 	 */
 	public function getView()
 	{
-		return $this->view;
+		return $this->data['view'];
 	}
 	
 	/**
@@ -225,17 +223,6 @@ abstract class Controller {
 	public function getData()
 	{
 		return $this->data;
-	}
-	
-	/**
-	 * Sets a view.
-	 *
-	 * @param string $dir Directory in app/views/ where the view is
-	 * @param string $view Name of the view to load
-	 */
-	protected function setView($dir, $view)
-	{
-		$this->view = array($dir, $view);
 	}
 	
 	/**
@@ -254,6 +241,11 @@ abstract class Controller {
 			elseif(in_array($action, $value))
 				$this->$key();
 		}
+	}
+	
+	public static function getControllerClassName($controllerName)
+	{
+		return 'App\\Controllers\\' . ucfirst($controllerName) . 'Controller';
 	}
 	
 }

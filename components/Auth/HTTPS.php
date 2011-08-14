@@ -8,13 +8,15 @@ class HTTPS extends ProtocolAbstract
 	
 	public function init()
 	{
-		if($this->secure)
+		if(! $this->sessionPersist())
 		{
-			if($this->session->exists('user_secure') and !$this->sessionPersist())
-				$this->session->destroy(true);
+			// If session persistance fails, the authenthication is not secure
+			$this->secure = false;
+			$this->session->delete('user_secure');
+			
+			if(! $this->cookiePersist())
+				$this->cookie->delete('user_data');
 		}
-		elseif($this->cookie->exists('user_data') and !$this->cookiePersist())
-			$this->cookie->delete('user_data');
 		
 		return true;	
 	}
@@ -23,7 +25,7 @@ class HTTPS extends ProtocolAbstract
 	{	
 		$this->sessionCreate($user, 'user_secure');
 		
-		$cookie_time = $user->getRemember() ? $this->cookie_time : 0;
+		$cookie_time = $user->remember ? $this->cookie_time : 0;
 		
 		$this->cookieCreate($user, $cookie_time);
 			
@@ -46,6 +48,9 @@ class HTTPS extends ProtocolAbstract
 	
 	private function sessionPersist()
 	{
+		if(!$this->secure or !$this->session->exists('user_secure'))
+			return false;
+		
 		$session_data = $this->session->read('user_secure');
 		
 		if(! $user = $this->sessionUser($session_data))

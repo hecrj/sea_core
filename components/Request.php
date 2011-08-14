@@ -54,6 +54,12 @@ class Request
 		return $this->ajax;
 	}
 	
+	public function redirectTo($path)
+	{
+		header('Location: '. $path);
+		exit();
+	}
+	
 }
 
 ?>

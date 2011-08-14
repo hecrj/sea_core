@@ -5,31 +5,14 @@ use Core\Components\Request;
 use Core\Components\DynamicInjector;
 use Core\Components\Cache;
 
-### View class
 class View
 {	
-	/**
-	 * Contains controller data as var_name => value
-	 *
-	 * @var array
-	 */
-	private $request;
 	private $controller;
 	private $injector;
 	private $path;
 	
-	/**
-	 * Constructs a view.
-	 *
-	 * @param object $request       Core\Components\Request    A request object
-	 * @param object $controller    Core\Controller            A controller object
-	 * @return View
-	 */
-	public function __construct(Request $request, Controller $controller, DynamicInjector $injector)
-	{
-		// Set view request
-		$this->request = $request;
-		
+	public function __construct(Controller $controller, DynamicInjector $injector)
+	{	
 		// Set view controller
 		$this->controller = $controller;
 		
@@ -40,16 +23,12 @@ class View
 		$this->path = $this->controller->getView();
 	}
 	
-	public function init()
+	public function init($isAjax = false)
 	{
-		// If Request is an AJAX request
-		if($this->request->isAjax())
-			// Render only the view, without layout
+		if($isAjax)
 			$this->render();
 
-		// If Request is not an AJAX request
 		else
-			// Load layout associated to controller
 			$this->load();
 	}
 	
@@ -96,18 +75,18 @@ class View
 	 * $this->render(); --> Will load 'pages/contact.html.php' view file
 	 * 
 	 * // Load a partial
-	 * $this->render('users/login_form'); --> Will load 'users/_login_form.php.html' partial file
+	 * $this->render('users/login_form'); --> Will load 'users/_login_form.html.php' partial file
 	 *
 	 * @param string $partial Name of the partial file to load. If it's null, the view is loaded.
-	 * @param array $options Hash of options, like collection set and cache directory and file in an array.
+	 * @param mixed $dataCache Additional data in an array or a Cache instance.
 	 */
-	public function render($partial = null, Array $options = null)
+	public function render($partial = null, $dataCache = null)
 	{
 		$view = $this;
 		
 		// Normal view if it's empty
 		if(empty($partial))
-			$file = DIR . 'app/views/' . $this->path[0] .'/'. $this->path[1] .'.html.php';
+			$file = DIR . 'app/views/' . $this->path .'.html.php';
 	
 		// Partial if it isn't empty
 		else
@@ -120,52 +99,63 @@ class View
 		}
 				
 		// If cache is set
-		if($options['cache'] instanceof Cache)
+		if($dataCache instanceof Cache)
 		{
-			if(!$options['cache']->load())
-				$options['cache']->flush()->generate($file);
+			$cache = $dataCache;
+			
+			if(!$cache->load())
+				$cache->generate($file)->load();
 		}
 		
 		// If cache is not set
 		else
 		{
+			$data = $dataCache;
+			
 			// ERROR 404 if the file isn't found
 			if(!is_file($file))
 				throw new \RuntimeException('The requested partial or view file doesn\'t exist in: <strong>'.$file.'</strong>');
 			
 			// If collection is not defined
-			if(!isset($options['collection']))
-				// Iterate over $data and set variables for layout
-				foreach($this->controller->getData() as $key => $value)
-					$$key = $value;
+			if($data == null)
+				$data = $this->controller->getData();
 			
-			// If collection is defined
-			else
-				// Set collection shortcut
-				$collection = $options['collection'];
+			// Iterate over $data and set variables for layout
+			foreach($data as $key => $value)
+				$$key = $value;
 					
 			// Render file
 			require($file);
 		}
 	}
 	
-	public function is($dir = null, $file = null)
+	public function block($controllerName, $action, Array $arguments = null)
 	{
-		$dir = (null === $dir or $dir == $this->path[0]);
-		$file = (null === $file or $file == $this->path[1]);
-		
-		return ($dir and $file);
+		try
+		{
+			$controller = $this->controller;
+			$blockControllerClassName = $controller::getControllerClassName($controllerName);
+			
+			$blockController = new $blockControllerClassName($this->injector->get('componentInjector'));
+			$blockController->initBlock($action, (array)$arguments);
+			
+			$view = new self($blockController, $this->injector);
+			$view->render();
+		}
+		catch(\Exception $e)
+		{
+			$exceptionView = DIR . 'app/views/exceptions/block.html.php';
+			
+			if(is_file($exceptionView))
+				require($exceptionView);
+			else
+				throw $e;
+		}
 	}
 	
 	public function css_tag($path_file, $media = 'screen')
 	{
 		return '<link href="/css/' . $path_file . '.css" rel="stylesheet" type="text/css" media="'.$media.'" />
-	';
-	}
-	
-	public function js_tag($path_file)
-	{
-		return '<script src="/js/' . $path_file . '.js" type="text/javascript"></script>
 	';
 	}
 	

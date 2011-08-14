@@ -8,12 +8,22 @@ class Cache
 	private $data = array();
 	private $path;
 	private $filename;
-	private $flush = false;
+	private $fullPath;
+	private $break;
+	private $until;
+	private $broken;
 	
 	public function __construct()
 	{}
 	
-	public function set(Array $data)
+	public function set($key, $value)
+	{
+		$this->data[$key] = $value;
+		
+		return $this;
+	}
+	
+	public function setData(Array $data)
 	{
 		if(empty($this->data))
 			$this->data = $data;
@@ -21,26 +31,42 @@ class Cache
 		return $this;
 	}
 	
-	public function path($path, $filename)
+	public function path($path, $filename = null)
 	{
-		if(!isset($this->path))
-		{
-			$this->path = $path;
-			$this->filename = $filename;
-		}
+		$this->path = $path;
+		$this->filename = $filename;
+		$this->fullPath = DIR . 'cache/' . $this->path .'/'. $this->filename .'.cache';
+		$this->broken = false;
+			
+		return $this;
+	}
+	
+	public function until($until)
+	{
+		$this->break = $until;
+		$this->until = true;
 		
 		return $this;
 	}
 	
-	public function flush($flush = true)
+	public function since($since)
 	{
-		$this->flush = (bool)$flush;
+		$this->break = $since;
+		$this->until = false;
 		
 		return $this;
+	}
+	
+	public function isBroken()
+	{
+		return $this->broken;
 	}
 	
 	public function generate($template)
 	{
+		if($this->filename == null)
+			throw new \RuntimeException('Cache filename is not defined. Impossible to generate cache file.');
+		
 		// Iterate over data array
 		foreach($this->data as $key => $value)
 			// Assign key named variables to array values
@@ -59,59 +85,56 @@ class Cache
 		// Get contents
 		$content = ob_get_contents();
 
-		if($this->flush)
-			// End and flush output buffering
-			ob_end_flush();
-		else
-			// End and clean output buffering
-			ob_end_clean();
+		// End and clean output buffering
+		ob_end_clean();
 		
 		// Make directories for cache files --> Recursive
 		if(!file_exists(DIR . 'cache/' . $this->path) and ! @mkdir(DIR . 'cache/' . $this->path, 0777, true))
 			throw new \RuntimeException('Impossible to create directories for cache files: ' . $this->path, 404);
 
 		// Generate cache file
-		file_put_contents(DIR . 'cache/' . $this->path .'/'. $this->filename .'.cache', $content);
+		file_put_contents($this->fullPath, $content);
 		
 		return $this;
 	}
 	
 	public function load()
-	{
-		// Set cache file path
-		$full_path = DIR . 'cache/' . $this->path .'/'. $this->filename .'.cache';
-		
+	{	
 		// If cache file does not exist
-		if(! is_file($full_path))
+		if($this->filename == null or ! is_file($this->fullPath))
 			return false;
 		
-		// Load cache file
-		require($full_path);
+		if(isset($this->break))
+		{
+			$contents = file_get_contents($this->fullPath);
+			$parts = explode($this->break, $contents);
+			
+			$this->broken = (count($parts) > 1);
+			
+			if($this->until)
+				echo $parts[0];
+			else
+				echo $parts[1];
+		}
+		else
+			require($this->fullPath);
 		
 		return true;
 	}
 	
-	public function clean($directory, $file = null)
+	public function clean()
 	{
 		// Set directory path
-		$dir_path = DIR . 'cache/' . $directory;
-		
-		// If directory path has / final
-		if(substr($dir_path, -1) == '/')
-			// Remove / final
-			$dir_path = substr($dir_path, 0, strlen($dir_path) - 1);
+		$dir_path = DIR . 'cache/' . $this->path;
 		
 		// If we need to clean a cache file
-		if(!empty($file))
-		{
-			// Set file path
-			$file_path = $dir_path .'/'. $file .'.cache';
-			
-			if(! is_file($file_path))
+		if($this->filename != null)
+		{	
+			if(! is_file($this->fullPath))
 				return false;
 			
 			// Exception if delete cache file fails
-			if(! @unlink($file_path))
+			if(! @unlink($this->fullPath))
 				throw new \RuntimeException('Impossible delete file: <strong>'. $file_path .'</strong>');
 		}
 		

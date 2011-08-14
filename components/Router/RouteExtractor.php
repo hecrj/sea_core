@@ -21,25 +21,26 @@ class RouteExtractor extends Analyzer
 	{
 		$path = $route->getPath();
 		$format = $rules['page_format'] ?: $route->getPageFormat();
-		$pattern = '/'. $format .'([0-9]+)\/?/';
+		$pattern = '/\/'. $format .'([0-9]+)\/?/';
 		
 		if(preg_match($pattern, $path, $matches))
 		{
 			$route->setPage($matches[1]);
 			$route->setPageFormat($format);
 			
-			$cleanPath = preg_replace($pattern, '', $path);
-			$route->setPath($cleanPath);
+			$path = preg_replace($pattern, '', $path);
 		}
+		
+		// Remove last / form the route
+		if(substr($path, -1) == '/')
+			$path = substr($path, 0, -1);
+		
+		$route->setPath($path);
 	}
 	
 	private function setControllerArgumentsAsRouteParts($route)
 	{
 		$path = $route->getPath();
-		
-		if(substr($path, -1) == '/')
-			$path = substr($path, 0, -1);
-		
 		$this->controllerArguments = explode('/', $path);
 	}
 	

@@ -129,7 +129,7 @@ class Form
 		return $this;
 	}
 	
-	public function select($label, $name, Array $selects, Array $custom = null, $selected = null)
+	public function select($label, $name, Array $selects, $selected = null, Array $custom = null)
 	{
 		if(is_null($selected) and $this->model)
 			$selected = $this->model->$name;
