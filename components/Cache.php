@@ -9,12 +9,17 @@ class Cache
 	private $path;
 	private $filename;
 	private $fullPath;
+	private $exists = true;
 	private $break;
 	private $until;
-	private $broken;
+	private $broken = false;
 	
-	public function __construct()
-	{}
+	public function __construct($path, $filename)
+	{
+		$this->path = $path;
+		$this->filename = $filename;
+		$this->fullPath = DIR . 'cache/' . $path .'/'. $filename .'.cache';
+	}
 	
 	public function set($key, $value)
 	{
@@ -28,16 +33,6 @@ class Cache
 		if(empty($this->data))
 			$this->data = $data;
 		
-		return $this;
-	}
-	
-	public function path($path, $filename = null)
-	{
-		$this->path = $path;
-		$this->filename = $filename;
-		$this->fullPath = DIR . 'cache/' . $this->path .'/'. $this->filename .'.cache';
-		$this->broken = false;
-			
 		return $this;
 	}
 	
@@ -95,14 +90,16 @@ class Cache
 		// Generate cache file
 		file_put_contents($this->fullPath, $content);
 		
+		$this->exists = true;
+		
 		return $this;
 	}
 	
 	public function load()
-	{	
+	{
 		// If cache file does not exist
-		if($this->filename == null or ! is_file($this->fullPath))
-			return false;
+		if(!$this->exists or $this->filename == null or !is_file($this->fullPath))
+			return $this->exists = false;
 		
 		if(isset($this->break))
 		{

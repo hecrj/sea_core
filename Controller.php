@@ -14,61 +14,15 @@ use Core\Components\DynamicInjector;
  */
 abstract class Controller {
 	
-	/**
-	 * Stores layout file name to load with the view
-	 *
-	 * @var string
-	 */
 	protected $layout = 'application';
-	
-	/**
-	 * Stores access filtering conditions using arrays.
-	 * If set to FALSE, access filtering will be disabled.
-	 *
-	 * @var mixed
-	 */
+	protected $view;
 	protected $access_filter = false;
-	
-	/**
-	 * Array with functions to call before the action is called.
-	 *
-	 * @var array
-	 */
 	protected $before_filter;
-	
-	/**
-	 * Array of functions to call after the action finishes.
-	 *
-	 * @var array
-	 */
 	protected $after_filter;
-	
-	/**
-	 * Stores controller name.
-	 *
-	 * @var string
-	 */
 	private $name;
-	
-	/**
-	 * Stores a component injector to inject dependencies to components dynamically.
-	 *
-	 * @var DynamicInjector
-	 */
 	private $injector;
-	
-	/**
-	 * Stores action resulting data.
-	 *
-	 * @var array
-	 */
 	private $data = array();
     
-	/**
-	 * Creates a new controller.
-	 *
-	 * @param DynamicInjector $injector Dynamic component injector to use dependency injection.
-	 */
 	public function __construct(DynamicInjector $injector)
 	{	
 		$class_name = get_class($this);
@@ -76,36 +30,11 @@ abstract class Controller {
 		$this->injector = $injector;
 	}
 	
-	/**
-	 * Method to obtain a component.
-	 *
-	 * @param string $name Name of the component to obtain.
-	 * @return object Requested component.
-	 */
-	public function get($name)
-	{
-		return $this->injector->get($name);
-	}
-	
-	/**
-	 * Magic method to set data easily:
-	 * $this->foo = 'bar';
-	 *
-	 * @param string $key Name of the key to assign to the data
-	 * @param string $value Data value
-	 */
 	public function __set($key, $value)
 	{
 		$this->data[$key] = $value;
 	}
 	
-	/**
-	 * Magic method to get data easily:
-	 * $this->foo // returns 'bar'
-	 *
-	 * @param string $key Name of the key assigned to the data
-	 * @return multitype Data value:
-	 */
 	public function __get($key)
 	{
 		return $this->data[$key];
@@ -136,7 +65,7 @@ abstract class Controller {
 	{	
 		$action = $reflection->name;
 		
-		$this->data['view'] = $this->name .'/'. $action;
+		$this->view = $this->name .'/'. $action;
 		
 		if($this->before_filter)
 			$this->callbacksFor($action, $this->before_filter);
@@ -185,53 +114,32 @@ abstract class Controller {
 		}
 	}
 	
-	/**
-	 * Gets the name of the controller.
-	 * 
-	 * @return string Controller name
-	 */
+		
+	public function get($name)
+	{
+		return $this->injector->get($name);
+	}
+
 	public function getName()
 	{
 		return $this->name;
 	}
 	
-	/**
-	 * Gets the layout of the controller.
-	 * 
-	 * @return string Controller layout
-	 */
 	public function getLayout()
 	{
 		return $this->layout;
 	}
 	
-	/**
-	 * Gets the view of the controller.
-	 * 
-	 * @return array View data
-	 */
 	public function getView()
 	{
-		return $this->data['view'];
+		return $this->view;
 	}
 	
-	/**
-	 * Gets the stored data in the controller.
-	 * 
-	 * @return array Data stored in the controller
-	 */
 	public function getData()
 	{
 		return $this->data;
 	}
 	
-	/**
-	 * Calls $callbacks functions if key matches with the action or if it
-	 * is an integer (non related to an action).
-	 *
-	 * @param string $action Action to match the callback with
-	 * @param array $callbacks Array of callback functions to be called
-	 */
 	private function callbacksFor($action, Array $callbacks){
 		foreach($callbacks as $key => $value)
 		{

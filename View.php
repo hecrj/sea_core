@@ -10,16 +10,12 @@ class View
 	private $controller;
 	private $injector;
 	private $path;
+	private $partials = array();
 	
 	public function __construct(Controller $controller, DynamicInjector $injector)
 	{	
-		// Set view controller
 		$this->controller = $controller;
-		
-		// Set helper injector
 		$this->injector = $injector;
-		
-		// Get view path info
 		$this->path = $this->controller->getView();
 	}
 	
@@ -45,9 +41,7 @@ class View
 	 * @param string $file Name of the layout file to load
 	 */
 	private function load()
-	{
-		$view = $this;
-		
+	{	
 		// Set layout path
 		$layout_file = DIR . 'app/views/layouts/' . $this->controller->getLayout() . '.html.php';
 		

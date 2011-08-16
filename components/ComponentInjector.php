@@ -8,7 +8,6 @@ class ComponentInjector extends DynamicInjector
 	
 	protected $classes = array(
 		'auth'			=>	'Core\\Components\\Auth\\HTTPS',
-		'cache'			=>	'Core\\Components\\Cache',
 		'cookie'		=>	'Core\\Components\\Cookie',
 		'request'		=>	'Core\\Components\\Request',
 		'route'			=>	'Core\\Components\\Router\\Route',

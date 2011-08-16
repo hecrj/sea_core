@@ -9,6 +9,7 @@ class Pagination
 	private $model;
 	private $limit = 10;
 	private $conditions = array();
+	private $include = array();
 	private $order = 'id ASC';
 	private $actual_page;
 	private $total_pages;
@@ -38,6 +39,13 @@ class Pagination
 	public function conditions(Array $conditions)
 	{
 		$this->conditions = $conditions;
+		
+		return $this;
+	}
+	
+	public function includes(Array $include)
+	{
+		$this->include = $include;
 		
 		return $this;
 	}
@@ -81,6 +89,7 @@ class Pagination
 		// Return results
 		return $model::all(array(
 			'conditions'	=>	$this->conditions,
+			'include'		=>	$this->include,
 			'limit'			=>	$this->limit,
 			'order'			=>	$this->order,
 			'offset'		=>	$offset
