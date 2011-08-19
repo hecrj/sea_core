@@ -7,9 +7,9 @@ class Router
 	private $rules;
 	private $analyzers = array();
 	
-	public function __construct(Array $routeRules)
+	public function __construct(Array $rules)
 	{
-		$this->rules = $routeRules;
+		$this->rules = $rules;
 	}
 	
 	public function addAnalyzer(Analyzer $analyzer)

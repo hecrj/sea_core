@@ -23,12 +23,12 @@ class RouteExtractor extends Analyzer
 		$format = $rules['page_format'] ?: $route->getPageFormat();
 		$pattern = '/\/'. $format .'([0-9]+)\/?/';
 		
-		if(preg_match($pattern, $path, $matches))
+		if(preg_match($pattern, '/'. $path, $matches))
 		{
 			$route->setPage($matches[1]);
 			$route->setPageFormat($format);
 			
-			$path = preg_replace($pattern, '', $path);
+			$path = preg_replace($pattern, '', '/'. $path);
 		}
 		
 		// Remove last / form the route

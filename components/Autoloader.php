@@ -10,7 +10,7 @@ class Autoloader
 	public function __construct()
 	{}
 	
-	public function register($prepend = true)
+	public function register()
 	{
 		spl_autoload_register(array($this, 'load'), true, false);
 	}	

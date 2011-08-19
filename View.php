@@ -1,31 +1,26 @@
 <?php
 
 namespace Core;
-use Core\Components\Request;
 use Core\Components\DynamicInjector;
 use Core\Components\Cache;
 
 class View
 {	
-	private $controller;
 	private $injector;
-	private $path;
+	private $data = array();
 	private $partials = array();
+	private $extend;
 	
-	public function __construct(Controller $controller, DynamicInjector $injector)
+	public function __construct(DynamicInjector $injector)
 	{	
-		$this->controller = $controller;
 		$this->injector = $injector;
-		$this->path = $this->controller->getView();
 	}
 	
-	public function init($isAjax = false)
+	public function extend($extend)
 	{
-		if($isAjax)
-			$this->render();
-
-		else
-			$this->load();
+		$this->extend = $extend;
+		
+		return $this;
 	}
 	
 	protected function get($name)
@@ -33,66 +28,74 @@ class View
 		return $this->injector->get($name);
 	}
 	
-	/**
-	 * Loads layout passed.
-	 *
-	 * After instantiate a View, the Controller calls load function to render its related layout.
-	 *
-	 * @param string $file Name of the layout file to load
-	 */
-	private function load()
-	{	
-		// Set layout path
-		$layout_file = DIR . 'app/views/layouts/' . $this->controller->getLayout() . '.html.php';
+	protected function set($key, $value)
+	{
+		$this->data[$key] = $value;
 		
-		// Exception if the layout doesn't exist
-		if(! is_file($layout_file))
-			throw new \RuntimeException('The requested layout file doesn\'t exist in: <strong>'.$layout_file.'</strong>', 404);
-		
-		// Iterate over $data and set variables for layout
-		foreach($this->controller->getData() as $key => $value)
-			$$key = $value;
-			
-		// Render layout
-		require($layout_file);
+		return $this;
 	}
 	
-	/**
-	 * Renders a view or a partial.
-	 *
-	 * In the layouts is very usual to call this method. If is needed to load the view related with Controller,
-	 * then this method must be called without @param. If is needed to load a partial, then this method must be
-	 * called with the file name of the partial.
-	 * 
-	 * EXAMPLE: If we access this URL http://www.domain.com/pages/contact
-	 * // Load a view
-	 * $this->render(); --> Will load 'pages/contact.html.php' view file
-	 * 
-	 * // Load a partial
-	 * $this->render('users/login_form'); --> Will load 'users/_login_form.html.php' partial file
-	 *
-	 * @param string $partial Name of the partial file to load. If it's null, the view is loaded.
-	 * @param mixed $dataCache Additional data in an array or a Cache instance.
-	 */
-	public function render($partial = null, $dataCache = null)
+	protected function output($key)
 	{
-		$view = $this;
+		if(! isset($this->data[$key]))
+			return null;
 		
-		// Normal view if it's empty
-		if(empty($partial))
-			$file = DIR . 'app/views/' . $this->path .'.html.php';
+		return $this->data[$key];
+	}
 	
-		// Partial if it isn't empty
+	public function partial($name, $path = null, $dataCache = null)
+	{
+		if($path == null)
+			$this->loadPartial($name);
+		
+		$this->partials[$name] = array($path, $dataCache);
+		
+		return $this;
+	}
+	
+	private function loadPartial($name)
+	{
+		if(! isset($this->partials[$name]))
+			return false;
+		
+		$this->render($this->partials[$name][0], $this->partials[$name][1]);
+	}
+	
+	public function load($viewPath, Array $viewData = null)
+	{	
+		// Set layout path
+		$viewPath = DIR . 'app/views/'. $viewPath .'.html.php';
+		
+		// Exception if the layout doesn't exist
+		if(! is_file($viewPath))
+			throw new \RuntimeException('The requested view file doesn\'t exist in: <strong>'.$viewPath.'</strong>', 404);
+		
+		$this->extend = null;
+		
+		ob_start();
+		
+		$this->contextRequire($viewPath, (array)$viewData);
+		
+		if($this->extend == null)
+			ob_end_flush();
+		
 		else
 		{
-			// Get partial name with preg_split
-			list(/* EMPTY */, $path, $partial_name) = preg_split('/(.*\/)?([^\/]+)/', $partial, 0, PREG_SPLIT_DELIM_CAPTURE);
+			$this->data['content'] = ob_get_contents();
 		
-			// Set file path of partial: _partial_name
-			$file = DIR . 'app/views/' . $path . '_'.$partial_name . '.html.php';
+			ob_end_clean();
+			
+			$this->load($this->extend);
 		}
+		
+	}
+	
+	public function render($partial = null, $dataCache = null)
+	{	
+
+		list(/* EMPTY */, $path, $partial_name) = preg_split('/(.*\/)?([^\/]+)/', $partial, 0, PREG_SPLIT_DELIM_CAPTURE);
+		$file = DIR . 'app/views/' . $path . '_'.$partial_name . '.html.php';
 				
-		// If cache is set
 		if($dataCache instanceof Cache)
 		{
 			$cache = $dataCache;
@@ -100,41 +103,33 @@ class View
 			if(!$cache->load())
 				$cache->generate($file)->load();
 		}
-		
-		// If cache is not set
 		else
 		{
 			$data = $dataCache;
-			
-			// ERROR 404 if the file isn't found
+
 			if(!is_file($file))
 				throw new \RuntimeException('The requested partial or view file doesn\'t exist in: <strong>'.$file.'</strong>');
 			
-			// If collection is not defined
-			if($data == null)
-				$data = $this->controller->getData();
-			
-			// Iterate over $data and set variables for layout
-			foreach($data as $key => $value)
-				$$key = $value;
-					
-			// Render file
-			require($file);
+			$this->contextRequire($file, (array)$data);
 		}
+	}
+	
+	private function contextRequire($file, $data)
+	{	
+		extract($data);	
+		require($file);
 	}
 	
 	public function block($controllerName, $action, Array $arguments = null)
 	{
 		try
 		{
-			$controller = $this->controller;
-			$blockControllerClassName = $controller::getControllerClassName($controllerName);
+			$blockControllerClassName = Controller::getControllerClassName($controllerName);
 			
 			$blockController = new $blockControllerClassName($this->injector->get('componentInjector'));
 			$blockController->initBlock($action, (array)$arguments);
 			
-			$view = new self($blockController, $this->injector);
-			$view->render();
+			$this->render($blockController->getView(), $blockController->getData());
 		}
 		catch(\Exception $e)
 		{
@@ -145,12 +140,6 @@ class View
 			else
 				throw $e;
 		}
-	}
-	
-	public function css_tag($path_file, $media = 'screen')
-	{
-		return '<link href="/css/' . $path_file . '.css" rel="stylesheet" type="text/css" media="'.$media.'" />
-	';
 	}
 	
 }

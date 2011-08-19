@@ -14,7 +14,6 @@ use Core\Components\DynamicInjector;
  */
 abstract class Controller {
 	
-	protected $layout = 'application';
 	protected $view;
 	protected $access_filter = false;
 	protected $before_filter;
@@ -41,7 +40,7 @@ abstract class Controller {
 	}
 	
 	public function init($action, Array $arguments)
-	{
+	{	
 		$reflection = new \ReflectionMethod($this, $action);
 		
 		if($reflection->isPublic())
@@ -63,12 +62,12 @@ abstract class Controller {
 	
 	private function call($reflection, $arguments)
 	{	
-		$action = $reflection->name;
+		$this->action = $reflection->name;
 		
-		$this->view = $this->name .'/'. $action;
+		$this->view = $this->name .'/'. $this->action;
 		
 		if($this->before_filter)
-			$this->callbacksFor($action, $this->before_filter);
+			$this->callbacksFor($this->before_filter);
 		
 		// if($this->access_filter)
 			// ...
@@ -79,7 +78,7 @@ abstract class Controller {
 			$this->data = $actionData;
 		
 		if($this->after_filter)
-			$this->callbacksFor($action, $this->after_filter);
+			$this->callbacksFor($this->after_filter);
 	}
 	
 	private function callAction($reflection, $arguments)
@@ -125,11 +124,6 @@ abstract class Controller {
 		return $this->name;
 	}
 	
-	public function getLayout()
-	{
-		return $this->layout;
-	}
-	
 	public function getView()
 	{
 		return $this->view;
@@ -140,13 +134,13 @@ abstract class Controller {
 		return $this->data;
 	}
 	
-	private function callbacksFor($action, Array $callbacks){
+	private function callbacksFor(Array $callbacks){
 		foreach($callbacks as $key => $value)
 		{
 			if(is_int($key))
 				$this->$value();
 			
-			elseif(in_array($action, $value))
+			elseif(in_array($this->action, $value))
 				$this->$key();
 		}
 	}

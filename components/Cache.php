@@ -10,8 +10,6 @@ class Cache
 	private $filename;
 	private $fullPath;
 	private $exists = true;
-	private $break;
-	private $until;
 	private $broken = false;
 	
 	public function __construct($path, $filename)
@@ -28,33 +26,20 @@ class Cache
 		return $this;
 	}
 	
+	public function get($key)
+	{
+		if(! isset($this->data[$key]))
+			return null;
+		
+		return $this->data[$key];
+	}
+	
 	public function setData(Array $data)
 	{
 		if(empty($this->data))
 			$this->data = $data;
 		
 		return $this;
-	}
-	
-	public function until($until)
-	{
-		$this->break = $until;
-		$this->until = true;
-		
-		return $this;
-	}
-	
-	public function since($since)
-	{
-		$this->break = $since;
-		$this->until = false;
-		
-		return $this;
-	}
-	
-	public function isBroken()
-	{
-		return $this->broken;
 	}
 	
 	public function generate($template)
@@ -95,26 +80,21 @@ class Cache
 		return $this;
 	}
 	
+	public function dynamic($varName)
+	{
+		return '<?php echo $'. $varName .' ?>';
+	}
+	
 	public function load()
 	{
 		// If cache file does not exist
 		if(!$this->exists or $this->filename == null or !is_file($this->fullPath))
 			return $this->exists = false;
 		
-		if(isset($this->break))
-		{
-			$contents = file_get_contents($this->fullPath);
-			$parts = explode($this->break, $contents);
-			
-			$this->broken = (count($parts) > 1);
-			
-			if($this->until)
-				echo $parts[0];
-			else
-				echo $parts[1];
-		}
-		else
-			require($this->fullPath);
+
+		require($this->fullPath);
+		
+		echo "\n".'<!-- Loaded '. (microtime(true) - $GLOBALS['time']) .' -->'."\n";
 		
 		return true;
 	}

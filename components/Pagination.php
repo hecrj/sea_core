@@ -17,7 +17,13 @@ class Pagination
 	
 	public function __construct(Route $route)
 	{
-		$this->path = '/'. $route->getPath() .'/'. $route->getPageFormat();
+		$path = '/'. $route->getPageFormat();
+		$routePath = $route->getPath();
+		
+		if(! empty($routePath))
+			$path = '/'. $routePath . $path;
+		
+		$this->path = $path;
 		$this->actual_page = $route->getPage();
 	}
 	

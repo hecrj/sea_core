@@ -89,15 +89,22 @@ class Form
 		return $this;
 	}
 	
-	public function label($label, $name, $content)
+	public function label($label, $name, $content, $tip)
 	{	
-		echo '                    <div id="field_' . $name .'"' . (($this->posted and $this->model) ? ' class="' . (($this->model->errors->on($name)) ? 'error' : 'success') . '"' : '' ) . '>
-                        <label for="' . $name . '">' . $label . '</label>
-                        ' . $content . '
-                    </div>'."\n";
+		if($this->posted and $this->model)
+			$class =' class="' . (($this->model->errors->on($name)) ? 'error' : 'success') . '"';
+		
+		echo '  <div id="field_'. $name .'"'. $class .'>'."\n";
+		echo '    <label for="' . $name . '">' . $label . '</label>'."\n";
+		echo '    ' . $content . "\n";
+		
+		if($tip != null)
+			echo '    <span id="tip_'. $name .'">'. $tip .'</span>'."\n";
+		
+		echo '  </div>'."\n";
 	}
 	
-	public function input($label, $name, Array $custom = null)
+	public function input($label, $name, Array $custom = null, $tip = null)
 	{
 		$options = array('type' => 'text');
 		
@@ -106,14 +113,14 @@ class Form
 		$input = '<input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . (($this->model) ? ' value="' . htmlspecialchars($this->model->$name) . '"' : '') .' />';
 		
 		if($label)
-			$this->label($label, $name, $input);
+			$this->label($label, $name, $input, $tip);
 		else
 			echo $input;
 			
 		return $this;
 	}
 	
-	public function textarea($label, $name, Array $custom = null)
+	public function textarea($label, $name, Array $custom = null, $tip = null)
 	{
 		$options = array('cols' => 60, 'rows' => 10);
 		
@@ -122,14 +129,14 @@ class Form
 		$textarea = '<textarea name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . '>'. (($this->model) ? htmlspecialchars($this->model->$name) : '') . '</textarea>';
 		
 		if($label)
-			$this->label($label, $name, $textarea);
+			$this->label($label, $name, $textarea, $tip);
 		else
 			echo $textarea;
 		
 		return $this;
 	}
 	
-	public function select($label, $name, Array $selects, $selected = null, Array $custom = null)
+	public function select($label, $name, Array $selects, $selected = null, Array $custom = null, $tip = null)
 	{
 		if(is_null($selected) and $this->model)
 			$selected = $this->model->$name;
@@ -143,7 +150,7 @@ class Form
 		$select = '<select name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"'. $options . '>' . "\n" . $select_options . '                        </select>';
 		
 		if($label)
-			$this->label($label, $name, $select);
+			$this->label($label, $name, $select, $tip);
 		else
 			echo $select;
 		

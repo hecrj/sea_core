@@ -117,8 +117,8 @@ class Application
 		$helperInjector = new $this->classes['HelperInjector']($this->componentInjector);
 		$helperInjector->set('componentInjector', $this->componentInjector);
 		
-		$this->view = new $this->classes['View']($this->controller, $helperInjector);
-		$this->view->init($this->request->isAjax());
+		$this->view = new $this->classes['View']($helperInjector);
+		$this->view->load($this->controller->getView(), $this->controller->getData());
 	}
 	
 }
