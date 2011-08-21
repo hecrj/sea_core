@@ -1,13 +1,13 @@
 <?php
 
 namespace Core\Components;
-use Core\Components\DynamicInjector;
 
 class HelperInjector extends DynamicInjector
 {
+	protected $injectorClass = 'Core\\Components\\ComponentInjector';
 	
 	protected $classes = array(
-		'componentInjector'	=>	'Core\\Components\\ComponentInjector',
+		'cache'				=>	'Core\\Helpers\\Cache',
 		'form'				=>	'Core\\Helpers\\Form',
 		'javascript'		=>	'Core\\Helpers\\Javascript'
 	);
@@ -16,7 +16,7 @@ class HelperInjector extends DynamicInjector
 		'form'			=>	array('security', 'request')
 	);
 	
-	protected $shared = array('javascript');
+	protected $shared = array('cache', 'javascript');
 	
 }
 

@@ -11,12 +11,12 @@ class Application
 {
 	private $classes;
 	private $autoloader;
+	private $componentInjector;
+	private $controller;
 	private $request;
 	private $route;
-	private $componentInjector;
 	private $router;
-	private $controller;
-	private $view;
+	private $templating;
 	
 	public function __construct(Array $classes)
 	{
@@ -39,7 +39,7 @@ class Application
 			$this->initConstants();
 			$this->initRouter();
 			$this->initController();
-			$this->initView();
+			$this->initTemplate();
 		}
 		
 		catch (\Exception $e)
@@ -112,13 +112,11 @@ class Application
 		$this->controller->init($controllerAction, $controllerArguments);
 	}
 	
-	private function initView()
+	private function initTemplate()
 	{
 		$helperInjector = new $this->classes['HelperInjector']($this->componentInjector);
-		$helperInjector->set('componentInjector', $this->componentInjector);
-		
-		$this->view = new $this->classes['View']($helperInjector);
-		$this->view->load($this->controller->getView(), $this->controller->getData());
+		$this->templating = new $this->classes['Templating']($helperInjector, new $this->classes['TemplateFinder']);
+		$this->templating->render($this->controller->getView(), $this->controller->getData());
 	}
 	
 }

@@ -4,7 +4,7 @@ namespace Core\Components;
 
 abstract class DynamicInjector
 {
-	
+	protected $injectorClass;
 	protected $classes;
 	protected $dependencies;
 	protected $shared = true;
@@ -13,7 +13,16 @@ abstract class DynamicInjector
 	
 	public function __construct(DynamicInjector $injector = null)
 	{
-		$this->injector  = $injector;
+		if(null !== $this->injectorClass and !($injector instanceof $this->injectorClass))
+			throw new \Exception('The injector in '. get_class($this) .' must be a '. $this->injectorClass .
+				'instance.');
+		
+		$this->injector = $injector;
+	}
+	
+	public function getInjector()
+	{
+		return $this->injector;
 	}
 	
 	public function set($name, $instance)

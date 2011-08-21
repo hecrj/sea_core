@@ -1,7 +1,6 @@
 <?php
 
 namespace Core\Components;
-use Core\Components\DynamicInjector;
 
 class ComponentInjector extends DynamicInjector
 {
@@ -23,7 +22,7 @@ class ComponentInjector extends DynamicInjector
 		'pagination'	=>	array('route')
 	);
 	
-	protected $shared = array('auth', 'cookie', 'request', 'route', 'session', 'security');
+	protected $shared = array('auth', 'cookie', 'request', 'route', 'session', 'security', 'templating');
 }
 
 ?>
