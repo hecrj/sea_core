@@ -15,7 +15,7 @@ abstract class DynamicInjector
 	{
 		if(null !== $this->injectorClass and !($injector instanceof $this->injectorClass))
 			throw new \Exception('The injector in '. get_class($this) .' must be a '. $this->injectorClass .
-				'instance.');
+				' instance.');
 		
 		$this->injector = $injector;
 	}

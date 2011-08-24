@@ -66,15 +66,18 @@ class Engine
 	/**
 	 * @todo Think about available arguments in parent templates.
 	 */
-	public function render($template, Array $arguments = null)
+	public function render($template = null, Array $arguments = null)
 	{
+		if(null === $template)
+			return false;
+		
 		$parentTemplate = $this->currentTemplate;
 		$this->currentTemplate = $template;
 		
 		$path = $this->finder->getPath($template);
 		
 		if(! is_file($path))
-			throw new \RuntimeException('The requested view file doesn\'t exist in: <strong>'.$path.'</strong>', 404);
+			throw new \RuntimeException('The requested view file doesn\'t exist in: <strong>'. $path .'</strong>', 404);
 		
 		if(null === $arguments)
 			$arguments = $this->arguments[$parentTemplate];
