@@ -5,30 +5,36 @@ namespace Core\Components\Router;
 class Router
 {
 	private $rules;
-	private $analyzers = array();
+	private $resolvers = array();
 	
-	public function __construct(Array $rules)
+	public function __construct()
+	{
+		foreach(func_get_args() as $resolver)
+			$this->addResolver($resolver);
+	}
+	
+	public function addResolver(ResolverAbstract $resolver)
+	{
+		$this->resolvers[] = $resolver;
+	}
+	
+	public function setRules(Array $rules)
 	{
 		$this->rules = $rules;
 	}
-	
-	public function addAnalyzer(Analyzer $analyzer)
-	{
-		$this->analyzers[] = $analyzer;
-	}
 
-	public function getControllerDataFrom(Route $route)
+	public function getControllerDataFrom(Request $request)
 	{
-		$rules = $this->getRulesFor($route);
+		$rules = $this->getRulesFor($request);
 		
-		foreach($this->analyzers as $analyzer)
-			if($analyzer->analyze($route, $rules))
-				return $analyzer->getControllerData();
+		foreach($this->resolvers as $resolver)
+			if(null !== $controllerData = $resolver->getControllerDataFrom($request, $rules))
+				return $controllerData;
 	}
 	
-	private function getRulesFor($route)
+	private function getRulesFor($request)
 	{
-		$subdomain = $route->getSubdomain();
+		$subdomain = $request->getSubdomain();
 		
 		if(!isset($this->rules[$subdomain]))
 			throw new \RuntimeException('Enrouting rules are not defined for

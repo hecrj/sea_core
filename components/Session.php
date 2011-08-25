@@ -1,6 +1,7 @@
 <?php
 
 namespace Core\Components;
+use Core\Components\Router\Request;
 
 ### Session component
 class Session
@@ -13,7 +14,7 @@ class Session
 	public function __construct(Cookie $cookie, Request $request)
 	{
 		$this->cookie = $cookie;
-		$this->secure = $request->isSSL();
+		$this->secure = $request->isSecure();
 		$this->name = $this->secure ? SESSION_SECURE : SESSION_NAME;
 		
 		$this->init();

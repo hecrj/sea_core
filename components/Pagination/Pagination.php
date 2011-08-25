@@ -1,7 +1,7 @@
 <?php
 
-namespace Core\Components;
-use Core\Components\Router\Route;
+namespace Core\Components\Pagination;
+use Core\Components\Router\Request;
 
 # Pagination helper
 class Pagination
@@ -15,16 +15,15 @@ class Pagination
 	private $total_pages;
 	private $path;
 	
-	public function __construct(Route $route)
-	{
-		$path = '/'. $route->getPageFormat();
-		$routePath = $route->getPath();
+	public function __construct(Request $request)
+	{		
+		$path = $request->getPath() .'/'. $request->get('pageFormat');
 		
-		if(! empty($routePath))
-			$path = '/'. $routePath . $path;
+		if($path[0] != '/')
+			$path = '/'. $path;
 		
 		$this->path = $path;
-		$this->actual_page = $route->getPage();
+		$this->actual_page = $request->get('page');
 	}
 	
 	public function model($model)

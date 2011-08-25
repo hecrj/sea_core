@@ -53,7 +53,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @todo Implement testIsSSL().
      */
     public function testIsSSL() {
-        $this->assertEquals(false, $this->request->isSSL());
+        $this->assertEquals(false, $this->request->isSecure());
     }
 
     /**

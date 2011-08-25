@@ -68,19 +68,17 @@ class Application
 	}
 	
 	private function initBasicComponents()
-	{	
-		$this->request = new $this->classes['Request']($_SERVER['REQUEST_METHOD'], $_SERVER['HTTPS'],
-				$_SERVER['HTTP_X_REQUESTED_WITH'], $_GET, $_POST, $_FILES);
-		$this->route = new $this->classes['Route']($_SERVER['HTTPS'], $_SERVER['HTTP_HOST'], $_SERVER['PATH_INFO']);
+	{
+		$requestClass = $this->classes['Request'];
+		$this->request = $requestClass::createFromGlobals();
 		
 		$this->componentInjector = new $this->classes['ComponentInjector'];
 		$this->componentInjector->set('request', $this->request);
-		$this->componentInjector->set('route', $this->route);
 	}
 	
 	private function initConstants()
 	{
-		if($this->request->isSSL())
+		if($this->request->isSecure())
 			$httpUrl = 'http://www.'. WEB_DOMAIN;
 		else
 			$httpsUrl = 'https://www.'. WEB_DOMAIN;
@@ -91,19 +89,16 @@ class Application
 	
 	private function initRouter()
 	{	
-		$matcher = new $this->classes['RouteMatcher'];
-		$extractor = new $this->classes['RouteExtractor'];
+		$this->router = $this->componentInjector->get('router');
 		
 		require(DIR . 'config/routes.php');
-		$this->router = new $this->classes['Router']($routeRules);
-		$this->router->addAnalyzer($matcher);
-		$this->router->addAnalyzer($extractor);
+		$this->router->setRules($routeRules);
 	}
 	
 	private function initController()
 	{
 		list($controllerName, $controllerAction,
-			$controllerArguments) = $this->router->getControllerDataFrom($this->route);
+			$controllerArguments) = $this->router->getControllerDataFrom($this->request);
 		
 		$controllerBaseClass = $this->classes['Controller'];
 		$controllerClassName = $controllerBaseClass::getControllerClassName($controllerName);

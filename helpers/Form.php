@@ -2,7 +2,7 @@
 
 namespace Core\Helpers;
 use Core\Components\Security;
-use Core\Components\Request;
+use Core\Components\Router\Request;
 
 # Form helper
 class Form
