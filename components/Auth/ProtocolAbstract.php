@@ -21,6 +21,7 @@ abstract class ProtocolAbstract
 		$this->session = $session;
 		$this->cookie  = $cookie;
 		$this->secure  = $session->isSecure();
+		$this->user = new $this->user_class;
 		
 		$this->init();
 	}
@@ -37,7 +38,7 @@ abstract class ProtocolAbstract
 		
 		$this->session->destroy(true);
 		$this->cookie->delete($cookie);
-		$this->user = null;
+		$this->user = new $this->user_class;
 		
 		return true;
 	}

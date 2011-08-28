@@ -8,7 +8,6 @@ class Engine
 {	
 	private $helperInjector;
 	private $finder;
-	private $cache;
 	private $arguments = array();
 	private $data = array();
 	private $currentTemplate;
@@ -18,7 +17,6 @@ class Engine
 	{	
 		$this->helperInjector = $injector;
 		$this->finder = $finder;
-		$this->cache = $injector->get('cache');
 	}
 	
 	protected function extend($parent)
@@ -53,16 +51,6 @@ class Engine
 		return $this->helperInjector->get($name);
 	}
 	
-	public function cache($path)
-	{
-		if($this->cache->setPath($path)->load())
-			return true;
-		
-		$this->cache->start();
-		
-		return false;
-	}
-	
 	/**
 	 * @todo Think about available arguments in parent templates.
 	 */
@@ -86,7 +74,16 @@ class Engine
 		
 		ob_start();
 		
-		$this->requireInContext($path, $arguments);
+		try
+		{
+			$this->requireInContext($path, $arguments);
+		}
+		catch(\Exception $e)
+		{
+			ob_end_clean();
+			
+			throw $e;
+		}
 		
 		if(isset($this->parent[$template]))
 		{
@@ -97,12 +94,7 @@ class Engine
 			$this->render($this->parent[$template] /*, array() */);
 		}
 		else
-		{
 			ob_end_flush();
-			
-			if($this->cache->isStarted())
-				$this->cache->save();
-		}
 		
 		$this->currentTemplate = $parentTemplate;
 	}

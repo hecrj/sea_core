@@ -6,39 +6,39 @@ class HTTP extends ProtocolAbstract
 {	
 	protected function init()
 	{
-		if(! $this->session->exists('user_data'))
+		if(!$this->sessionPersist())
 		{
-			if($this->cookie->exists('user_data') and !$this->cookiePersist())
-				$this->logout();
+			$this->session->delete('user_data');
+			
+			if(!$this->cookiePersist())
+				$this->cookie->delete('user_data');
 		}
-		elseif(! $this->sessionPersist())
-			$this->logout();
 		
 		return true;
 	}
 	
 	private function cookiePersist()
 	{
+		if(! $this->cookie->exists('user_data'))
+			return false;
+		
 		$cookie_data = $this->cookie->read('user_data');
 		
 		if(! $user = $this->cookieUser($cookie_data))
 			return false;
 		
-		// Persist user
 		return $this->persist($user);
 	}
 	
 	private function sessionPersist()
 	{
+		if(! $this->session->exists('user_data'))
+			return false;
+		
 		$session_data = $this->session->read('user_data');
 
 		if(! $user = $this->sessionUser($session_data))
-		{
-			if($this->cookie->exists('user_data'))
-				return $this->cookiePersist();
-			else
-				return false;
-		}
+			return false;
 		
 		$this->sessionUpdate($session_data);
 		$this->user = $user;

@@ -36,7 +36,6 @@ class Application
 		{
 			$this->initAutoloader();
 			$this->initBasicComponents();
-			$this->initConstants();
 			$this->initRouter();
 			$this->initController();
 			$this->initTemplate();
@@ -47,7 +46,8 @@ class Application
 			ob_clean();
 			
 			if(! @include(DIR .'app/views/exceptions/'. ($e->getCode() ? : '404') .'.html.php'))
-				echo 'The requested '. $e->getCode() .' error page does not exist!<br />'.$e->getMessage();
+				echo 'The requested '. $e->getCode() .' error page does not exist!<br />'.$e->getMessage().'<br />'.
+				$e->getTraceAsString();
 		}
 		
 		ob_end_flush();
@@ -76,17 +76,6 @@ class Application
 		$this->componentInjector->set('request', $this->request);
 	}
 	
-	private function initConstants()
-	{
-		if($this->request->isSecure())
-			$httpUrl = 'http://www.'. WEB_DOMAIN;
-		else
-			$httpsUrl = 'https://www.'. WEB_DOMAIN;
-		
-		define('HTTP_URL', $httpUrl);
-		define('HTTPS_URL', $httpsUrl);
-	}
-	
 	private function initRouter()
 	{	
 		$this->router = $this->componentInjector->get('router');
@@ -111,6 +100,8 @@ class Application
 	{
 		$helperInjector = new $this->classes['HelperInjector']($this->componentInjector);
 		$this->templating = new $this->classes['Templating']($helperInjector, new $this->classes['TemplateFinder']);
+		$this->componentInjector->set('templating', $this->templating);
+		
 		$this->templating->render($this->controller->getView(), $this->controller->getData());
 	}
 	

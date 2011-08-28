@@ -15,7 +15,7 @@ use Core\Components\DynamicInjector;
 abstract class Controller {
 	
 	protected $view;
-	protected $access_filter = false;
+	protected $accessFilter = false;
 	protected $before_filter;
 	protected $after_filter;
 	private $name;
@@ -69,16 +69,30 @@ abstract class Controller {
 		if($this->before_filter)
 			$this->callbacksFor($this->before_filter);
 		
-		// if($this->access_filter)
-			// ...
+		if($this->accessFilter)
+			$this->checkAccessFilter();
 		
 		$actionData = $this->callAction($reflection, $arguments);
 		
 		if(is_array($actionData))
-			$this->data = $actionData;
+			$this->data = array_merge($this->data, $actionData);
 		
 		if($this->after_filter)
 			$this->callbacksFor($this->after_filter);
+	}
+	
+	private function checkAccessFilter()
+	{	
+		$groupRole = (isset($this->accessFilter[$action])) ? $this->accessFilter[$action] : $this->accessFilter['*'];
+
+		if($groupRole)
+		{
+			$user = $this->get('auth')->getUser();
+			
+			if(!$user->is($groupRole))
+				throw new \RuntimeException('Sorry, but you don\'t have enough privilegies to access this page.<br />'.
+						'Your current role is: <strong>'. $user->role .'</strong>', 403);
+		}
 	}
 	
 	private function callAction($reflection, $arguments)
