@@ -19,6 +19,7 @@ abstract class Controller {
 	protected $before_filter;
 	protected $after_filter;
 	private $name;
+	private $action;
 	private $injector;
 	private $data = array();
     
@@ -63,7 +64,6 @@ abstract class Controller {
 	private function call($reflection, $arguments)
 	{	
 		$this->action = $reflection->name;
-		
 		$this->view = $this->name .'/'. $this->action;
 		
 		if($this->before_filter)
@@ -83,7 +83,7 @@ abstract class Controller {
 	
 	private function checkAccessFilter()
 	{	
-		$groupRole = (isset($this->accessFilter[$action])) ? $this->accessFilter[$action] : $this->accessFilter['*'];
+		$groupRole = (isset($this->accessFilter[$this->action])) ? $this->accessFilter[$this->action] : $this->accessFilter['*'];
 
 		if($groupRole)
 		{
@@ -92,6 +92,8 @@ abstract class Controller {
 			if(!$user->is($groupRole))
 				throw new \RuntimeException('Sorry, but you don\'t have enough privilegies to access this page.<br />'.
 						'Your current role is: <strong>'. $user->role .'</strong>', 403);
+			
+			$this->__set('user', $user);
 		}
 	}
 	
