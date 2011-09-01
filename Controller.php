@@ -69,7 +69,7 @@ abstract class Controller {
 		if($this->before_filter)
 			$this->callbacksFor($this->before_filter);
 		
-		if($this->accessFilter)
+		if($this->injector->has('auth'))
 			$this->checkAccessFilter();
 		
 		$actionData = $this->callAction($reflection, $arguments);
@@ -82,19 +82,18 @@ abstract class Controller {
 	}
 	
 	private function checkAccessFilter()
-	{	
+	{
+		$user = $this->get('auth')->getUser();
+		$this->__set('user', $user);
+		
+		if(! $this->accessFilter)
+			return;
+		
 		$groupRole = (isset($this->accessFilter[$this->action])) ? $this->accessFilter[$this->action] : $this->accessFilter['*'];
 
-		if($groupRole)
-		{
-			$user = $this->get('auth')->getUser();
-			
-			if(!$user->is($groupRole))
-				throw new \RuntimeException('Sorry, but you don\'t have enough privilegies to access this page.<br />'.
-						'Your current role is: <strong>'. $user->role .'</strong>', 403);
-			
-			$this->__set('user', $user);
-		}
+		if($groupRole and !$user->is($groupRole))
+			throw new \RuntimeException('Sorry, but you don\'t have enough privilegies to access this page.<br />'.
+					'Your current role is: <strong>'. $user->role .'</strong>', 403);
 	}
 	
 	private function callAction($reflection, $arguments)
