@@ -19,5 +19,3 @@ class Finder
 		return DIR . 'app/views/'. $template .'.html.php';
 	}
 }
-
-?>

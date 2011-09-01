@@ -56,4 +56,3 @@ class MatchResolver extends ResolverAbstract
 	}
 	
 }
-?>

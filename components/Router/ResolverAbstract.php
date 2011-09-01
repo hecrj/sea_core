@@ -28,5 +28,3 @@ abstract class ResolverAbstract
 			return null;
 	}
 }
-
-?>

@@ -106,5 +106,3 @@ abstract class DynamicInjector
 		return $this->saveInstance($name, $this->inject($this->classes[$name], $this->dependencies[$name]));
 	}
 }
-
-?>

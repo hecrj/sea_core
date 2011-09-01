@@ -154,5 +154,3 @@ class Cache
 		return @file_put_contents($path .'.cache', $content, LOCK_EX) !== false;
 	}
 }
-
-?>

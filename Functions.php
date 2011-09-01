@@ -10,5 +10,3 @@ function rand_str($length = 10)
 
     return $string;
 }
-
-?>

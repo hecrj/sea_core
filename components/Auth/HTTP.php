@@ -59,5 +59,3 @@ class HTTP extends ProtocolAbstract
 	}
 	
 }
-
-?>

@@ -50,5 +50,3 @@ class Cookie
 		return array_key_exists($name, $this->data);
 	}
 }
-
-?>

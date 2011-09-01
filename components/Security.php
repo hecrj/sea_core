@@ -42,5 +42,3 @@ class Security
 		return ($this->csrf_token == $csrf_token);
 	}
 }
-
-?>

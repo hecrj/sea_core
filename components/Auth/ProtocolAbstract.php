@@ -136,5 +136,3 @@ abstract class ProtocolAbstract
 	abstract protected function init();
 	abstract public function persist(/* UserInterface */$user);
 }
-
-?>

@@ -56,5 +56,3 @@ class Autoloader
 		return true;
 	}
 }
-
-?>

@@ -33,5 +33,3 @@ class PageResolver extends ResolverAbstract
 		return false;
 	}
 }
-
-?>

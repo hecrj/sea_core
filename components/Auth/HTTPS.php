@@ -67,5 +67,3 @@ class HTTPS extends ProtocolAbstract
 	}
 	
 }
-
-?>
