@@ -68,10 +68,7 @@ class Cache
 		$this->start();
 		$this->renderTemplate($template, $arguments);
 		
-		$contents = $this->save($cacheFile);
-		$this->end();
-		
-		return $contents;
+		return $this->save($cacheFile);
 	}
 	
 	private function renderTemplate($template, $arguments)
@@ -138,6 +135,8 @@ class Cache
 		
 		if(! $this->writeCacheFile($path, $content))
 			throw new \RuntimeException('Impossible to save cache file: '. $path);
+		
+		$this->end();
 		
 		return $content;
 	}
