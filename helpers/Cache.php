@@ -1,12 +1,12 @@
 <?php
 
 namespace Core\Helpers;
+use Core\Components\Cache\CacheAbstract;
 use Core\Components\Templating\Engine;
 
-class Cache
+class Cache extends CacheAbstract
 {
 	private $templating;
-	private $dir;
 	private $started = false;
 	
 	public function __construct(Engine $templating)
@@ -14,26 +14,9 @@ class Cache
 		$this->templating = $templating;
 	}
 	
-	public function setDir($path)
-	{
-		$this->dir = $path;
-		
-		return $this;
-	}
-	
-	public function getDir()
-	{
-		return $this->dir;
-	}
-	
-	public function getCacheDir()
-	{
-		return DIR .'cache/'. $this->dir .'/';
-	}
-	
 	public function load($cacheFile)
 	{
-		$path = $this->getCacheDir() . $cacheFile .'.cache';
+		$path = $this->getCachePath($cacheFile);
 		
 		if(! is_file($path))
 			return false;
@@ -45,7 +28,7 @@ class Cache
 	
 	public function get($cacheFile)
 	{
-		$path = $this->getCacheDir() . $cacheFile .'.cache';
+		$path = $this->getCachePath($cacheFile);
 		
 		if(! is_file($path))
 			return false;
@@ -131,9 +114,7 @@ class Cache
 		if(! $this->makeDirectory($dir))
 			throw new \RuntimeException('Impossible to create directories for cache files: '. $dir);
 		
-		$path = $dir . $filename;
-		
-		if(! $this->writeCacheFile($path, $content))
+		if(! $this->writeCacheFile($filename, $content))
 			throw new \RuntimeException('Impossible to save cache file: '. $path);
 		
 		$this->end();
@@ -149,8 +130,10 @@ class Cache
 		return @mkdir($dir, 0777, true);
 	}
 	
-	private function writeCacheFile($path, $content)
+	private function writeCacheFile($filename, $content)
 	{
-		return @file_put_contents($path .'.cache', $content, LOCK_EX) !== false;
+		$path = $this->getCachePath($filename);
+		
+		return @file_put_contents($path, $content, LOCK_EX) !== false;
 	}
 }
