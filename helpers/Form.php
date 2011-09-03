@@ -138,7 +138,7 @@ class Form
 		
 		$options = $this->options_string($options, $custom);
 		
-		$textarea = '<textarea name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . '>'. $value . '</textarea>';
+		$textarea = '<textarea id="' . $name . '" name="' . $this->model_active . '[' . $name . ']"' . $options . '>'. $value . '</textarea>';
 		
 		if($label)
 			$this->label($label, $name, $textarea, $tip);
@@ -164,7 +164,7 @@ class Form
 		foreach($selects as $value => $option)
 			$select_options .= '  <option value="' . $value . '"' . (($selected == $value) ? ' selected="selected"' : '') . '>' . $option . '</option>'."\n";
 		
-		$select = '<select name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"'. $options . '>' . "\n" . $select_options . '                        </select>';
+		$select = '<select id="' . $name . '" name="' . $this->model_active . '[' . $name . ']"'. $options . '>' . "\n" . $select_options . '                        </select>';
 		
 		if($label)
 			$this->label($label, $name, $select, $tip);
