@@ -6,7 +6,7 @@ use Core\Components\Router\Request;
 
 # Form helper
 class Form
-{
+{	
 	private $security;
 	private $posted;
 	private $models = array();
@@ -73,7 +73,7 @@ class Form
 			return $this;
 
 		echo '  <div class="message error">'."\n";
-		echo '    <h3>Some errors have ocurred:</h3>'."\n";
+		echo '    <h3>'. FORM_ERROR .'</h3>'."\n";
 		echo '    <ul>'."\n";
 			
 		foreach($model->errors->full_messages() as $error_msg)
@@ -104,11 +104,14 @@ class Form
 	
 	public function input($label, $name, Array $custom = null, $tip = null)
 	{
-		$options = array('type' => 'text');
+		$options = array(
+			'type'	=> 'text',
+			'value' => $this->model ? htmlspecialchars($this->model->$name) : null
+		);
 		
 		$options = $this->options_string($options, $custom);
 		
-		$input = '<input name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . (($this->model) ? ' value="' . htmlspecialchars($this->model->$name) . '"' : '') .' />';
+		$input = '<input id="' . $name . '" name="' . $this->model_active . '[' . $name . ']"' . $options .' />';
 		
 		if($label)
 			$this->label($label, $name, $input, $tip);
@@ -120,11 +123,22 @@ class Form
 	
 	public function textarea($label, $name, Array $custom = null, $tip = null)
 	{
-		$options = array('cols' => 60, 'rows' => 10);
+		$options = array(
+			'cols' => 60,
+			'rows' => 10
+		);
+		
+		if(isset($custom['value']))
+		{
+			$value = $custom['value'];
+			unset($custom['value']);
+		}
+		else
+			$value = ($this->model) ? htmlspecialchars($this->model->$name) : null;
 		
 		$options = $this->options_string($options, $custom);
 		
-		$textarea = '<textarea name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . '>'. (($this->model) ? htmlspecialchars($this->model->$name) : '') . '</textarea>';
+		$textarea = '<textarea name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"' . $options . '>'. $value . '</textarea>';
 		
 		if($label)
 			$this->label($label, $name, $textarea, $tip);
@@ -134,9 +148,14 @@ class Form
 		return $this;
 	}
 	
-	public function select($label, $name, Array $selects, $selected = null, Array $custom = null, $tip = null)
+	public function select($label, $name, Array $selects, Array $custom = null, $tip = null)
 	{
-		if(is_null($selected) and $this->model)
+		if(isset($custom['selected']))
+		{
+			$selected = $custom['selected'];
+			unset($custom['selected']);
+		}
+		elseif($this->model)
 			$selected = $this->model->$name;
 		
 		$options = array();

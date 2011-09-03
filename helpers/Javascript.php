@@ -11,9 +11,10 @@ class Javascript
 		$this->js = array();
 	}
 	
-	public function add($jsPath)
+	public function add()
 	{
-		$this->js[] = $jsPath;
+		foreach(func_get_args() as $jsPath)
+			$this->js[] = $jsPath;
 	}
 	
 	public function render()
