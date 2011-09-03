@@ -72,16 +72,18 @@ class Session
 		$_SESSION[$name] = $this->data[$name] = ($serialize) ? serialize($value) : $value;
 	}
 	
-	public function flash($flash_message)
+	public function flash($name)
 	{
-		// Flash shortcut
-		$this->write('flash', $flash_message);
+		if(null !== $flash = $this->read($name))
+			$this->delete($name);
+		
+		return $flash;
 	}
 	
 	public function read($name, $unserialize = true)
-	{
-		if($name == 'flash')
-			unset($_SESSION['flash']);
+	{	
+		if(! $this->exists($name))
+			return null;
 		
 		// Unserialize and return session data
 		return ($unserialize) ? unserialize($this->data[$name]) : $this->data[$name];
@@ -102,6 +104,6 @@ class Session
 	public function exists($name)
 	{
 		// Check if session data exists
-		return array_key_exists($name, $this->data);
+		return isset($this->data[$name]);
 	}
 }
