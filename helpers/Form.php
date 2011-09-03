@@ -43,8 +43,8 @@ class Form
 		$options = array('method' => 'post', 'accept-charset' => 'utf-8');
 		$options = $this->options_string($options, $custom);
 		
-		echo '                <form action="' . ((empty($action)) ? '' : '/'. $action) . '"' . $options . '>
-                    <input name="csrf_token" type="hidden" value="' . $this->security->getCSRFToken() . '" />'."\n";
+		echo '<form action="' . ((empty($action)) ? '' : '/'. $action) . '"' . $options . '>'."\n";
+        echo '  <input name="csrf_token" type="hidden" value="' . $this->security->getCSRFToken() . '" />'."\n";
 		
 		return $this;
 	}
@@ -55,46 +55,44 @@ class Form
 		$this->model = $model;
 		$this->model_active = $reference;
 		
-		if($model)
-		{
-			if(!$this->editing)
-				$this->editing = !$model->is_new_record();
+		if(!$model)
+			return $this;
+		
+		if(!$this->editing)
+			$this->editing = !$model->is_new_record();
 			
-			if($this->posted)
-			{
-				if(is_object($model->errors))
-				{
-					if($model->errors->is_empty())
-						return $this;
-				}
-				elseif($model->is_valid())
-					return $this;
-
-				$errors = '                    <div class="message error">
-		            <h3>Some errors have ocurred:</h3>
-		            <ul>'."\n";
-
-				foreach($model->errors->full_messages() as $error_msg)
-				{
-					$errors .= '                        <li>' . $error_msg . '</li>'."\n";
-				}
-
-				$errors .= '                    </ul>
-		            </div>'."\n";
-
-				echo $errors;
-			}
+		if(! $this->posted)
+			return $this;
+			
+		if(is_object($model->errors))
+		{
+			if($model->errors->is_empty())
+				return $this;
 		}
+		elseif($model->is_valid())
+			return $this;
+
+		echo '  <div class="message error">'."\n";
+		echo '    <h3>Some errors have ocurred:</h3>'."\n";
+		echo '    <ul>'."\n";
+			
+		foreach($model->errors->full_messages() as $error_msg)
+			echo '      <li>' . $error_msg . '</li>'."\n";
+
+		echo '    </ul>'."\n";
+		echo '  </div>'."\n";
 		
 		return $this;
 	}
 	
 	public function label($label, $name, $content, $tip)
 	{	
-		if($this->posted and $this->model)
-			$class =' class="' . (($this->model->errors->on($name)) ? 'error' : 'success') . '"';
+		echo '  <div id="field_'. $name .'"';
 		
-		echo '  <div id="field_'. $name .'"'. $class .'>'."\n";
+		if($this->posted and $this->model)
+			echo ' class="' . (($this->model->errors->on($name)) ? 'error' : 'success') . '"';
+		
+		echo '>'."\n";
 		echo '    <label for="' . $name . '">' . $label . '</label>'."\n";
 		echo '    ' . $content . "\n";
 		
@@ -115,7 +113,7 @@ class Form
 		if($label)
 			$this->label($label, $name, $input, $tip);
 		else
-			echo $input;
+			echo '  '. $input ."\n";
 			
 		return $this;
 	}
@@ -131,7 +129,7 @@ class Form
 		if($label)
 			$this->label($label, $name, $textarea, $tip);
 		else
-			echo $textarea;
+			echo '  '. $textarea ."\n";
 		
 		return $this;
 	}
@@ -145,7 +143,7 @@ class Form
 		$options = $this->options_string($options, $custom);
 		
 		foreach($selects as $value => $option)
-			$select_options .= '                            <option value="' . $value . '"' . (($selected == $value) ? ' selected="selected"' : '') . '>' . $option . '</option>'."\n";
+			$select_options .= '  <option value="' . $value . '"' . (($selected == $value) ? ' selected="selected"' : '') . '>' . $option . '</option>'."\n";
 		
 		$select = '<select name="' . $this->model_active . '[' . $name . ']" id="' . $name . '"'. $options . '>' . "\n" . $select_options . '                        </select>';
 		
@@ -159,10 +157,10 @@ class Form
 	
 	public function close($default, $editing = null)
 	{
-		echo '                    <div class="buttons">
-                        <button type="submit" class="button">' . (($editing and $this->editing) ? $editing : $default) . '</button>
-                    </div>
-                </form>'."\n";
+		echo '  <div class="buttons">'."\n";
+		echo '    <button type="submit" class="button">' . (($editing and $this->editing) ? $editing : $default) . '</button>'."\n";
+		echo '  </div>'."\n";
+		echo '</form>'."\n";
 	}
 	
 	
