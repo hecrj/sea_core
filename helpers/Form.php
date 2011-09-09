@@ -127,14 +127,6 @@ class Form
 		return $this;
 	}
 	
-	public function errorIf($condition, $errorMsg)
-	{
-		if($condition)
-			$this->errorMessage($errorMsg);
-		
-		return $this;
-	}
-	
 	public function label($label, $name, $content, $tip)
 	{	
 		echo '  <div id="field_'. $name .'"';
