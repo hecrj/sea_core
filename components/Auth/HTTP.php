@@ -52,7 +52,7 @@ class HTTP extends ProtocolAbstract
 		
 		if($user->remember)
 			$this->cookieCreate($user, $this->cookie_time);
-		
+
 		$this->user = $user;
 		
 		return true;
