@@ -12,8 +12,6 @@ class Form
 	private $models = array();
 	private $model_active;
 	private $model;
-	private $inputs = array();
-	private $buttons = array();
 	private $editing = false;
 	
 	public function __construct(Security $security, Request $request)
@@ -49,38 +47,90 @@ class Form
 		return $this;
 	}
 	
-	public function to($reference, $model = false)
+	public function to($reference, Array $custom = null)
 	{
-		$this->models[$reference] = $model;
-		$this->model = $model;
+		$options = array('model' => false, 'success' => null, 'error' => null);
+		
+		if(null != $custom)
+			$options = array_merge($options, $custom);
+		
+		$this->model = $this->models[$reference] = $options['model'];
 		$this->model_active = $reference;
 		
-		if(!$model)
-			return $this;
+		$this->checkEdition();
 		
+		if($this->posted)
+			$this->checkPost($options);
+		
+		return $this;
+	}
+	
+	private function checkEdition()
+	{
 		if(!$this->editing)
-			$this->editing = !$model->is_new_record();
-			
-		if(! $this->posted)
-			return $this;
-			
-		if(is_object($model->errors))
+			$this->editing = $this->model ? !$this->model->is_new_record() : false;
+	}
+	
+	private function checkPost($options)
+	{
+		if($this->model)
+			$this->checkModel($options);
+		
+		elseif(null != $options['error'])
+			$this->errorMessage($options['error']);
+	}
+	
+	private function checkModel($options)
+	{	
+		if(is_object($this->model->errors))
+			$valid = $this->model->errors->is_empty();
+		else
+			$valid = $this->model->is_valid();
+		
+		if($valid)
 		{
-			if($model->errors->is_empty())
-				return $this;
+			if(null != $options['success'])
+				$this->successMessage($options['success']);
 		}
-		elseif($model->is_valid())
-			return $this;
-
+		else
+			$this->errorMessage($this->model->errors->full_messages());
+	}
+	
+	public function successMessage($message)
+	{
+		echo '  <div class="message success">'."\n";
+		echo '    <p>'. $message .'</p>'."\n";
+		echo '  </div>'."\n";
+		
+		return $this;
+	}
+	
+	public function errorMessage($message)
+	{
 		echo '  <div class="message error">'."\n";
 		echo '    <h3>'. FORM_ERROR .'</h3>'."\n";
-		echo '    <ul>'."\n";
+		
+		if(is_array($message))
+		{
+			echo '    <ul>'."\n";
 			
-		foreach($model->errors->full_messages() as $error_msg)
-			echo '      <li>' . $error_msg . '</li>'."\n";
+			foreach($message as $error_msg)
+				echo '      <li>' . $error_msg . '</li>'."\n";
 
-		echo '    </ul>'."\n";
+			echo '    </ul>'."\n";
+		}
+		else
+			echo '    <p>'. $message .'</p>'."\n";
+		
 		echo '  </div>'."\n";
+		
+		return $this;
+	}
+	
+	public function errorIf($condition, $errorMsg)
+	{
+		if($condition)
+			$this->errorMessage($errorMsg);
 		
 		return $this;
 	}
