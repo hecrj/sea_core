@@ -65,8 +65,7 @@ class Engine
 			return false;
 		
 		$parentTemplate = $this->currentTemplate;
-		$this->totalTemplates += 1;
-		$this->currentTemplate = $this->totalTemplates;
+		$this->currentTemplate = $this->totalTemplates = $this->totalTemplates + 1;
 		
 		$path = $this->finder->getPath($template);
 		
@@ -97,7 +96,10 @@ class Engine
 		else
 			ob_end_flush();
 		
-		$this->currentTemplate = $parentTemplate;
+		if($parentTemplate == 0)
+			$this->clean();
+		else
+			$this->currentTemplate = $parentTemplate;
 	}
 	
 	private function requireInContext($file, $data)
@@ -107,6 +109,12 @@ class Engine
 		extract((array)$data);
 		
 		require($file);
+	}
+	
+	private function clean()
+	{
+		$this->globals = $this->data = $this->parent = array();
+		$this->currentTemplate = $this->totalTemplates = 0;
 	}
 	
 	public function block($controllerName, $action, Array $arguments = null)
