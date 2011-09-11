@@ -33,12 +33,12 @@ class Application
 		ob_start();
 		
 		try
-		{
+		{	
 			$this->initAutoloader();
-			$this->initBasicComponents();
+			
+			$this->componentInjector = new $this->classes['ComponentInjector'];
 			$this->initRouter();
 			$this->initController();
-			$this->initTemplate();
 		}
 		
 		catch (\Exception $e)
@@ -52,7 +52,7 @@ class Application
 		
 		ob_end_flush();
  	}
-	
+
 	private function initAutoloader()
 	{
 		require(DIR . 'core/components/Autoloader.php');
@@ -67,18 +67,13 @@ class Application
 		$this->autoloader->register();
 	}
 	
-	private function initBasicComponents()
+	private function initRouter()
 	{
+		$this->router = $this->componentInjector->get('router');
 		$requestClass = $this->classes['Request'];
 		$this->request = $requestClass::createFromGlobals();
 		
-		$this->componentInjector = new $this->classes['ComponentInjector'];
 		$this->componentInjector->set('request', $this->request);
-	}
-	
-	private function initRouter()
-	{	
-		$this->router = $this->componentInjector->get('router');
 		
 		require(DIR . 'config/routes.php');
 		$this->router->setRules($routeRules);
@@ -94,15 +89,8 @@ class Application
 		
 		$this->controller = new $controllerClassName($this->componentInjector);
 		$this->controller->init($controllerAction, $controllerArguments);
-	}
-	
-	private function initTemplate()
-	{
-		$helperInjector = new $this->classes['HelperInjector']($this->componentInjector);
-		$this->templating = new $this->classes['Templating']($helperInjector, new $this->classes['TemplateFinder']);
-		$this->componentInjector->set('templating', $this->templating);
 		
-		$this->templating->render($this->controller->getView(), $this->controller->getData());
+		$this->componentInjector->get('templating')->render($this->controller->getView(), $this->controller->getData());
 	}
 	
 }
