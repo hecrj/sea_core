@@ -7,9 +7,8 @@ abstract class DynamicInjector
 	protected $injectorClass;
 	protected $classes;
 	protected $dependencies;
-	protected $shared = true;
+	protected $shared = array();
 	private   $instances = array();
-	private   $injector;
 	
 	public function __construct(DynamicInjector $injector = null)
 	{
@@ -17,12 +16,14 @@ abstract class DynamicInjector
 			throw new \Exception('The injector in '. get_class($this) .' must be a '. $this->injectorClass .
 				' instance.');
 		
-		$this->injector = $injector;
-	}
-	
-	public function getInjector()
-	{
-		return $this->injector;
+		if(null !== $injector)
+		{
+			$this->instances['external_injector'] = $injector;
+			$this->shared[] = 'external_injector';
+		}
+		
+		$this->instances['injector'] = $this;
+		$this->shared[] = 'injector';
 	}
 	
 	public function set($name, $instance)
@@ -53,7 +54,7 @@ abstract class DynamicInjector
 	
 	private function saveInstance($name, $instance)
 	{
-		if($this->shared !== FALSE and ($this->shared === TRUE or in_array($name, $this->shared)))
+		if(in_array($name, $this->shared))
 			$this->instances[$name] = $instance;
 		
 		return $instance;
@@ -97,8 +98,8 @@ abstract class DynamicInjector
 		
 		if(!isset($this->classes[$name]))
 		{
-			if(null !== $this->injector)
-				return $this->injector->get($name);
+			if(isset($this->instances['external_injector']))
+				return $this->instances['external_injector']->get($name);
 			else
 				throw new \RuntimeException('Dependency not present in classes list or in instances of the injector: '. $name .'. Check your class: '. get_class($this));
 		}
