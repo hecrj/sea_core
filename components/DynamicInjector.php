@@ -12,12 +12,12 @@ abstract class DynamicInjector
 	
 	public function __construct(DynamicInjector $injector = null)
 	{
-		if(null !== $this->injectorClass and !($injector instanceof $this->injectorClass))
-			throw new \Exception('The injector in '. get_class($this) .' must be a '. $this->injectorClass .
-				' instance.');
-		
-		if(null !== $injector)
+		if(null !== $this->injectorClass)
 		{
+			if(!($injector instanceof $this->injectorClass))
+				throw new \Exception('The injector in '. get_class($this) .' must be a '. $this->injectorClass .
+					' instance.');
+			
 			$this->instances['external_injector'] = $injector;
 			$this->shared[] = 'external_injector';
 		}
@@ -98,7 +98,7 @@ abstract class DynamicInjector
 		
 		if(!isset($this->classes[$name]))
 		{
-			if(isset($this->instances['external_injector']))
+			if(null !== $this->injectorClass)
 				return $this->instances['external_injector']->get($name);
 			else
 				throw new \RuntimeException('Dependency not present in classes list or in instances of the injector: '. $name .'. Check your class: '. get_class($this));
