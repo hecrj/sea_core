@@ -47,40 +47,32 @@ class Form
 		return $this;
 	}
 	
-	public function to($reference, Array $custom = null)
-	{
-		$options = array('model' => false, 'success' => null, 'error' => null);
+	public function to($model, $success = null)
+	{	
+		if(is_object($model))
+			$reference = lcfirst(get_class($model));
+		else
+		{
+			$reference = $model;
+			$model = false;
+		}
 		
-		if(null != $custom)
-			$options = array_merge($options, $custom);
-		
-		$this->model = $this->models[$reference] = $options['model'];
+		$this->model = $this->models[$reference] = $model;
 		$this->model_active = $reference;
 		
-		$this->checkEdition();
+		if(! $model)
+			return $this;
+		
+		if(!$this->editing)
+			$this->editing = !$this->model->is_new_record();
 		
 		if($this->posted)
-			$this->checkPost($options);
+			$this->checkModel($success);
 		
 		return $this;
 	}
 	
-	private function checkEdition()
-	{
-		if(!$this->editing)
-			$this->editing = $this->model ? !$this->model->is_new_record() : false;
-	}
-	
-	private function checkPost($options)
-	{
-		if($this->model)
-			$this->checkModel($options);
-		
-		elseif(null != $options['error'])
-			$this->errorMessage($options['error']);
-	}
-	
-	private function checkModel($options)
+	private function checkModel($success)
 	{	
 		if(is_object($this->model->errors))
 			$valid = $this->model->errors->is_empty();
@@ -89,8 +81,8 @@ class Form
 		
 		if($valid)
 		{
-			if(null != $options['success'])
-				$this->successMessage($options['success']);
+			if(null != $success)
+				$this->successMessage($success);
 		}
 		else
 			$this->errorMessage($this->model->errors->full_messages());
