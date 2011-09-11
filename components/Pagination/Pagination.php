@@ -9,6 +9,7 @@ class Pagination
 	private $model;
 	private $limit = 10;
 	private $conditions = array();
+	private $joins = array();
 	private $include = array();
 	private $order = 'id ASC';
 	private $actual_page;
@@ -48,6 +49,40 @@ class Pagination
 		return $this;
 	}
 	
+	public function joins(Array $joins)
+	{
+		$this->joins = $joins;
+		
+		return $this;
+	}
+	
+	public function through($item)
+	{
+		$model = $this->model;
+		$modelTable = $model::table()->table;
+		$modelColumn = strtolower($model);
+		$itemTable = $item::table()->table;
+		$itemColumn = strtolower(get_class($item));
+		$throughTable = $modelColumn .'_'. $itemTable;
+		
+		
+		$conditions = "{$throughTable}.{$itemColumn}_id = ? AND ".
+				"{$modelTable}.id = {$throughTable}.{$modelColumn}_id";
+				
+		if(empty($this->conditions))
+			$this->conditions = array($conditions, $item->id);
+		
+		else
+		{
+			$this->conditions[0] .= ' AND '. $conditions;
+			$this->conditions[] = $item->id;
+		}
+		
+		$this->joins[] = $modelColumn . $itemTable;
+		
+		return $this;
+	}
+	
 	public function includes(Array $include)
 	{
 		$this->include = $include;
@@ -71,14 +106,15 @@ class Pagination
 	
 	public function getResults()
 	{
-		// Set options to select models efficiently
-		$count_options = array(
-			'select'		=> 'id',
-			'conditions' 	=> $this->conditions
-		);
-		
 		// Set model var for parsing reasons
 		$model = $this->model;
+		
+		// Set options to select models efficiently
+		$count_options = array(
+			'select'		=> $model::table()->table .'.id',
+			'conditions' 	=> $this->conditions,
+			'joins'			=> $this->joins
+		);
 		
 		// Calculate total pages
 		$this->total_pages = ceil( count( $model::all($count_options) ) / $this->limit );
@@ -94,6 +130,7 @@ class Pagination
 		// Return results
 		return $model::all(array(
 			'conditions'	=>	$this->conditions,
+			'joins'			=>	$this->joins,
 			'include'		=>	$this->include,
 			'limit'			=>	$this->limit,
 			'order'			=>	$this->order,
@@ -113,75 +150,54 @@ class Pagination
 	
 	public function render(Array $custom = null)
 	{	
-		// Default options hash
-		$options = array('ajax' => false, 'previous' => '&laquo; Previous', 'next' => 'Next &raquo');
+		$options = array('pages' => array(5, 5), 'previous' => PAGINATION_PREV, 'next' => PAGINATION_NEXT);
 		
-		// If custom options are set
 		if($custom)
-			// Merge default with custom options hash
 			$options = array_merge($options, $custom);
 		
-		// Print div for pagination
-		echo '                <div class="pagination'. (($options['ajax']) ? ' ajax-links' : '') . '">'."\n";
+		echo '<div class="pagination">'."\n";
+		echo '  <ul>'."\n";
 		
-		// If the actual page isn't 1
-		if($this->actual_page != 1)
-			// Print link to previous page
-			echo '                    <a href="' . $this->path . ($this->actual_page - 1) . '">'. $options['previous'] .'</a>'."\n";
+		$this->renderPreviousPages($options);
+		$this->renderPage($this->actual_page);
+		$this->renderNextPages($options);
 		
-		// If no page limit is set
-		if(!isset($options['pages']))
-			// Show all the pages
-			for($page = 1; $this->total_pages >= $page; $page ++)
-				echo '                    <a href="' . $this->path . $page . '"' . (($this->actual_page == $page) ? ' class="active"' : '') . '>' . $page . '</a>'."\n";
-		
-		// If page limit is set
-		else
-		{
-			// If page limit is integer
-			if(is_int($options['pages']))
-				// Previous pages and next pages equals to integer
-				$previous_pages = $next_pages = $options['pages'];
-				
-			// If page limit isn't an integer --> Array
-			else
-			{
-				// Previous pages are first integer of the array
-				$previous_pages = $options['pages'][0];
-				
-				// Next pages are second integer of the array
-				$next_pages = $options['pages'][1];
-			}
-			
-			$this->render_previous_pages($previous_pages);
-			
-			echo '                    <a href="' . $this->path . $this->actual_page . '" class="active">' . $this->actual_page . '</a>'."\n";
-			
-			$this->render_next_pages($next_pages);
-		}
-			
-		if($this->actual_page != $this->total_pages)
-			echo '                    <a href="' . $this->path . ($this->actual_page + 1) . '">'. $options['next'] .'</a>'."\n";
-		
-		echo '                </div>'."\n";
+		echo '  </ul>'."\n";
+		echo '</div>'."\n";
 	}
 	
-	private function render_previous_pages($pages)
+	private function renderPage($number, $text = null)
 	{
-		$pages_diff = $this->actual_page - $pages;
+		echo '    <li';
+		
+		if($this->actual_page == $number)
+			echo ' class="active"';
+		
+		echo '><a href="'. $this->path . $number. '">'. ($text ?: $number) .'</a></li>'."\n";
+	}
+	
+	private function renderPreviousPages($options)
+	{
+		if($this->actual_page != 1)
+			$this->renderPage($this->actual_page - 1, '&larr; '. $options['previous']);
+		
+		$pages_diff = $this->actual_page - $options['pages'][0];
 		
 		for($page = $this->actual_page - 1; $page > 0 and $page >= $pages_diff; $page --)
-			$previous_pages = '                    <a href="' . $this->path . $page . '">' . $page . '</a>'."\n" . $previous_pages;
+			$this->renderPage($page);
 			
 		echo $previous_pages;
 	}
 	
-	private function render_next_pages($pages)
-	{
-		$pages_diff = $this->actual_page + $pages;
+	private function renderNextPages($options)
+	{	
+		$pages_diff = $this->actual_page + $options['pages'][1];
 		
 		for($page = $this->actual_page + 1; $page <= $this->total_pages and $page <= $pages_diff; $page ++)
-			echo '                    <a href="' . $this->path . $page . '">' . $page . '</a>'."\n";
+			$this->renderPage($page);
+		
+		if($this->actual_page != $this->total_pages)
+			$this->renderPage($this->total_pages, $options['next'] .' &rarr;');
 	}
 	
 }
