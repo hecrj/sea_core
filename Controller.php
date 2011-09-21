@@ -84,7 +84,7 @@ abstract class Controller {
 	private function checkAccessFilter()
 	{
 		$user = $this->get('auth')->getUser();
-		$this->__set('user', $user);
+		$this->__set('authUser', $user);
 		
 		if(! $this->accessFilter)
 			return;
@@ -92,8 +92,15 @@ abstract class Controller {
 		$groupRole = (isset($this->accessFilter[$this->action])) ? $this->accessFilter[$this->action] : $this->accessFilter['*'];
 
 		if($groupRole and !$user->is($groupRole))
-			throw new \RuntimeException('Sorry, but you don\'t have enough privilegies to access this page.<br />'.
+		{
+			if($user->isLogged())
+				throw new \RuntimeException('Sorry, but you don\'t have enough privilegies to access this page.<br />'.
 					'Your current role is: <strong>'. $user->role .'</strong>', 403);
+			
+			$request = $this->get('request');
+			
+			$request->redirectTo(AUTH_LOGIN.'/'.base64_encode('/'.$request->getPath()));
+		}
 	}
 	
 	private function callAction($reflection, $arguments)
