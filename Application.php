@@ -33,7 +33,9 @@ class Application
 		ob_start();
 		
 		try
-		{	
+		{
+			require(DIR . 'config/application.php');
+			
 			$this->initAutoloader();
 			
 			$this->componentInjector = new $this->classes['ComponentInjector'];
@@ -58,8 +60,7 @@ class Application
 		require(DIR . 'core/components/Autoloader.php');
 		$this->autoloader = new $this->classes['Autoloader'];
 		
-		require(DIR . 'config/application.php');
-		
+		require(DIR . 'config/vendors.php');
 		foreach($vendors as $file => $path)
 			$this->autoloader->vendor($file, $path);
 		
