@@ -28,7 +28,7 @@ class Request
 		$ajax = ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
 		$secure = !empty($_SERVER['HTTPS']);
 		
-		$route = new Route($_SERVER['HTTP_HOST'], $_SERVER['PATH_INFO'], $secure);
+		$route = new Route($_SERVER['HTTP_HOST'], $_SERVER[ROUTE_PROTOCOL], $secure);
 		
 		$request = new self($route);
 		$request->setMethod($_SERVER['REQUEST_METHOD'])
