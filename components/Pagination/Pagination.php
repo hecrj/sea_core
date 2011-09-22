@@ -181,23 +181,29 @@ class Pagination
 		if($this->actual_page != 1)
 			$this->renderPage($this->actual_page - 1, '&larr; '. $options['previous']);
 		
-		$pages_diff = $this->actual_page - $options['pages'][0];
+		$page = $this->actual_page - $options['pages'][0];
 		
-		for($page = $this->actual_page - 1; $page > 0 and $page >= $pages_diff; $page --)
+		if($page < 0) $page = 1;
+		
+		while($page < $this->actual_page)
+		{
 			$this->renderPage($page);
 			
-		echo $previous_pages;
+			$page ++;
+		}
 	}
 	
 	private function renderNextPages($options)
 	{	
-		$pages_diff = $this->actual_page + $options['pages'][1];
+		$pagesDiff = $this->actual_page + $options['pages'][1];
 		
-		for($page = $this->actual_page + 1; $page <= $this->total_pages and $page <= $pages_diff; $page ++)
+		if($pagesDiff > $this->total_pages) $pagesDiff = $this->total_pages;
+		
+		for($page = $this->actual_page + 1; $page <= $pagesDiff; $page ++)
 			$this->renderPage($page);
 		
 		if($this->actual_page != $this->total_pages)
-			$this->renderPage($this->total_pages, $options['next'] .' &rarr;');
+			$this->renderPage($this->actual_page + 1, $options['next'] .' &rarr;');
 	}
 	
 }
