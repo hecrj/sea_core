@@ -11,7 +11,7 @@ abstract class ResolverAbstract
 	public function __construct(){}
 	
 	/**
-	 * @return boolean True means controller information has been set in Route.
+	 * @return boolean True means controller information has been set.
 	 */
 	abstract protected function resolve(Request $request, Array $rules);
 	
