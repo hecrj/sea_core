@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @todo REFACTORIZE
+ */
+
 namespace Core\Components\Router;
 
 class Router
@@ -25,17 +29,15 @@ class Router
 
 	public function getControllerDataFrom(Request $request)
 	{
-		$rules = $this->getRulesFor($request);
+		$rules = $this->getRulesFor($request->getSubdomain());
 		
 		foreach($this->resolvers as $resolver)
 			if(null !== $controllerData = $resolver->getControllerDataFrom($request, $rules))
 				return $controllerData;
 	}
 	
-	private function getRulesFor($request)
-	{
-		$subdomain = $request->getSubdomain();
-		
+	private function getRulesFor($subdomain)
+	{	
 		if(!isset($this->rules[$subdomain]))
 			throw new \RuntimeException('Enrouting rules are not defined for
 				subdomain: <strong>' . $subdomain . '</strong>', 404);

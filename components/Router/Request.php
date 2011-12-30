@@ -9,7 +9,6 @@ namespace Core\Components\Router;
  */
 class Request
 {
-
 	public $get = array();
 	public $post = array();
 	public $files = array();
