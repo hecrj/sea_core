@@ -111,7 +111,7 @@ class Engine
 		require($file);
 	}
 	
-	private function clean()
+	public function clean()
 	{
 		$this->globals = $this->data = $this->parent = array();
 		$this->currentTemplate = $this->totalTemplates = 0;

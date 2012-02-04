@@ -9,8 +9,7 @@ namespace Core\Components\Templating;
  */
 class Finder
 {	
-	public function __construct()
-	{
+	public function __construct() {
 		
 	}
 	
