@@ -96,4 +96,5 @@ class Fieldset extends Tag {
 	public function select($label, $id) {
 		return $this->field($label, $id, 'Select');
 	}
+	
 }

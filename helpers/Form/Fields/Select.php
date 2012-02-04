@@ -12,8 +12,8 @@ class Select extends Field {
 		return $this->options;
 	}
 	
-	public function option($text, $value) {
-		$this->options[$text] = $value;
+	public function option($text, $value = null) {
+		$this->options[$text] = $value ?: count($this->options);
 		
 		return $this;
 	}

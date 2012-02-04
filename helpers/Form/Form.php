@@ -41,7 +41,7 @@ class Form extends Tag {
 		return $this->fieldsets;
 	}
 	
-	public function fieldset($model = null) {
+	public function fieldset($model) {
 		if(!$this->editing and !$model->is_new_record())
 			$this->editing = true;
 		
@@ -80,5 +80,9 @@ class Form extends Tag {
 	
 	public function link($name) {
 		return $this->button($name, 'Link');
+	}
+	
+	public function isEditing() {
+		return $this->editing;
 	}
 }
