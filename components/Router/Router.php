@@ -27,13 +27,13 @@ class Router
 		$this->rules = $rules;
 	}
 
-	public function getControllerDataFrom(Request $request)
+	public function enroute(Request $request)
 	{
 		$rules = $this->getRulesFor($request->getSubdomain());
 		
 		foreach($this->resolvers as $resolver)
-			if(null !== $controllerData = $resolver->getControllerDataFrom($request, $rules))
-				return $controllerData;
+			if($resolver->resolves($request, $rules))
+				return;
 	}
 	
 	private function getRulesFor($subdomain)

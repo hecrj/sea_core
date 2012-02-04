@@ -15,16 +15,18 @@ abstract class ResolverAbstract
 	 */
 	abstract protected function resolve(Request $request, Array $rules);
 	
-	public function getControllerDataFrom(Request $request, Array $rules)
+	public function resolves(Request $request, Array $rules)
 	{
 		if($this->resolve($request, $rules))
 		{
+			$request->set('moduleName', $rules['module']);
 			$request->set('controllerName', $this->controllerName);
 			$request->set('controllerAction', $this->controllerAction);
+			$request->set('controllerArguments', $this->controllerArguments);
 			
-			return array($this->controllerName, $this->controllerAction, $this->controllerArguments);
+			return true;
 		}
 		else
-			return null;
+			return false;
 	}
 }

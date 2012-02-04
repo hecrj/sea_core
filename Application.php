@@ -14,9 +14,7 @@ class Application
 	private $componentInjector;
 	private $controller;
 	private $request;
-	private $route;
 	private $router;
-	private $templating;
 	
 	public function __construct(Array $classes)
 	{
@@ -47,9 +45,20 @@ class Application
 		{
 			ob_clean();
 			
-			if(! @include(DIR .'app/views/exceptions/'. ($e->getCode() ? : '404') .'.html.php'))
-				echo 'The requested '. $e->getCode() .' error page does not exist!<br />'.$e->getMessage().'<br />'.
-				$e->getTraceAsString();
+			try
+			{
+				$templating = $this->componentInjector->get('templating');
+				$templating->clean();
+				$templating->render('exceptions/'. ($e->getCode() ? : '404'), array('e' => $e));
+			}
+			
+			catch (\Exception $e)
+			{
+				echo '<h1>A critical error has occurred:</h1>';
+				echo '<p>'. $e->getMessage() .'</p>';
+				echo $e->getTraceAsString();
+			}
+
 		}
 		
 		ob_end_flush();
@@ -82,14 +91,18 @@ class Application
 	
 	private function initController()
 	{
-		list($controllerName, $controllerAction,
-			$controllerArguments) = $this->router->getControllerDataFrom($this->request);
+		$this->router->enroute($this->request);
+		
+		$moduleName = $this->request->get('moduleName');
+		$controllerName = $this->request->get('controllerName');
+		$controllerAction = $this->request->get('controllerAction');
 		
 		$controllerBaseClass = $this->classes['Controller'];
-		$controllerClassName = $controllerBaseClass::getControllerClassName($controllerName);
+		$controllerClass = $controllerBaseClass::getControllerClass($moduleName, $controllerName);
 		
-		$this->controller = new $controllerClassName($this->componentInjector);
-		$this->controller->init($controllerAction, $controllerArguments);
+		$this->controller = new $controllerClass($this->componentInjector);
+		$this->controller->setView($moduleName .'/'. $controllerName . '/' . $controllerAction);
+		$this->controller->init($controllerAction, $this->request->get('controllerArguments'));
 		
 		$this->componentInjector->get('templating')->render($this->controller->getView(), $this->controller->getData());
 	}

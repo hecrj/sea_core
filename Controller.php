@@ -15,7 +15,7 @@ use Core\Components\DynamicInjector;
 abstract class Controller {
 	
 	protected $view;
-	protected $accessFilter = false;
+	protected $access_filter = false;
 	protected $before_filter;
 	protected $after_filter;
 	private $name;
@@ -51,21 +51,8 @@ abstract class Controller {
 		
 	}
 	
-	public function initBlock($action, Array $arguments)
-	{
-		$reflection = new \ReflectionMethod($this, $action);
-		
-		if($reflection->isPublic() or $reflection->isProtected())
-			$this->call($reflection, $arguments);
-		else
-			throw new \RuntimeException('The called block action: <strong>'. $action .'</strong> is not public or protected!');
-	}
-	
 	private function call($reflection, $arguments)
-	{	
-		$this->action = $reflection->name;
-		$this->view = $this->name .'/'. $this->action;
-		
+	{
 		if($this->before_filter)
 			$this->callbacksFor($this->before_filter);
 		
@@ -84,12 +71,12 @@ abstract class Controller {
 	private function checkAccessFilter()
 	{
 		$user = $this->get('auth')->getUser();
-		$this->__set('authUser', $user);
+		$this->__set('user', $user);
 		
-		if(! $this->accessFilter)
+		if(! $this->access_filter)
 			return;
 		
-		$groupRole = (isset($this->accessFilter[$this->action])) ? $this->accessFilter[$this->action] : $this->accessFilter['*'];
+		$groupRole = (isset($this->access_filter[$this->action])) ? $this->access_filter[$this->action] : $this->access_filter['*'];
 
 		if($groupRole and !$user->is($groupRole))
 		{
@@ -151,6 +138,10 @@ abstract class Controller {
 		return $this->view;
 	}
 	
+	public function setView($view) {
+		$this->view = $view;
+	}
+	
 	public function getData()
 	{
 		return $this->data;
@@ -167,9 +158,9 @@ abstract class Controller {
 		}
 	}
 	
-	public static function getControllerClassName($controllerName)
+	public static function getControllerClass($moduleName, $controllerName)
 	{
-		return 'App\\Controllers\\' . ucfirst($controllerName) . 'Controller';
+		return 'App\\Controllers\\' . ucfirst($moduleName) . '\\' . ucfirst($controllerName) . 'Controller';
 	}
 	
 }
