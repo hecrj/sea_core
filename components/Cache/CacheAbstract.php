@@ -13,33 +13,25 @@ abstract class CacheAbstract
 	protected $dir;
 	protected $fileExtension = '.cache';
 	
-	public function setDir($dir)
-	{
-		$this->dir = $dir;
+	public function setDir($dir) {
+		// @todo Think about final slash...
+		//if(substr($dir, -1) == '/')
+		//	$dir = substr($dir, 0, -1);
+		
+		$this->dir = DIR .'cache/'. $dir;
 		
 		return $this;
 	}
 	
-	public function setDirForModel(Model $model)
-	{
-		$this->dir = $model::table()->table .'/'. $model->id;
-		
-		return $this;
+	public function to(Model $model) {
+		return $this->setDir($model::table()->table . '/' . $model->id);
 	}
 	
-	public function getDir()
-	{
+	public function getDir() {
 		return $this->dir;
 	}
 	
-	public function getCacheDir()
-	{
-		return DIR .'cache/'. $this->dir .'/';
+	public function getPath($filename) {
+		return $this->getDir() . '/' . $filename . $this->fileExtension;
 	}
-	
-	public function getCachePath($filename)
-	{
-		return $this->getCacheDir() . $filename . $this->fileExtension;
-	}
-	
 }

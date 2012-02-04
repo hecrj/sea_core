@@ -16,7 +16,7 @@ class Cache extends CacheAbstract
 	
 	public function load($cacheFile)
 	{
-		$path = $this->getCachePath($cacheFile);
+		$path = $this->getPath($cacheFile);
 		
 		if(! is_file($path))
 			return false;
@@ -28,7 +28,7 @@ class Cache extends CacheAbstract
 	
 	public function get($cacheFile)
 	{
-		$path = $this->getCachePath($cacheFile);
+		$path = $this->getPath($cacheFile);
 		
 		if(! is_file($path))
 			return false;
@@ -37,13 +37,11 @@ class Cache extends CacheAbstract
 	}
 	
 	public function render($cacheFile, $template, Array $arguments = null)
-	{	
+	{
 		if($this->load($cacheFile))
-			return true;
+			return;
 		
-		$contents = $this->generate($cacheFile, $template, $arguments);
-		
-		echo $contents;
+		echo $this->generate($cacheFile, $template, $arguments);
 	}
 	
 	public function generate($cacheFile, $template, Array $arguments = null)
@@ -109,7 +107,7 @@ class Cache extends CacheAbstract
 		
 		$content = $this->getContents();
 		
-		$dir = $this->getCacheDir();
+		$dir = $this->getDir();
 		
 		if(! $this->makeDirectory($dir))
 			throw new \RuntimeException('Impossible to create directories for cache files: '. $dir);
@@ -132,7 +130,7 @@ class Cache extends CacheAbstract
 	
 	private function writeCacheFile($filename, $content)
 	{
-		$path = $this->getCachePath($filename);
+		$path = $this->getPath($filename);
 		
 		return @file_put_contents($path, $content, LOCK_EX) !== false;
 	}

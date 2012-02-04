@@ -12,27 +12,41 @@ class Cache extends CacheAbstract
 	public function __construct()
 	{}
 	
-	public function clean()
-	{
+	public function clean() {
 		$filenames = func_get_args();
 		
 		if(empty($filenames))
-			$this->cleanCacheDirectory();
+			$this->cleanDirectory();
 		
 		else
-			foreach($filenames as $filename)
-				$this->cleanCacheFile($filename);
+			$this->cleanFiles($filenames);
 	}
 	
-	private function cleanCacheDirectory()
-	{
+	private function cleanDirectory($dir = null) {
+		if($dir === null)
+			$dir = $this->getDir();
 		
+		$elements = scandir($dir);
+		
+		foreach($elements as $element) {
+			if($element == '.' or $element == '..')
+				continue;
+			
+			$path = $dir .'/'. $element;
+			
+			if(is_file($path))
+				$this->cleanFile($path);
+			else
+				$this->cleanDirectory($path);
+		}
 	}
 	
-	private function cleanCacheFile($filename)
-	{
-		$path = $this->getCachePath($filename);
-		
+	private function cleanFiles($filenames) {
+		foreach($filenames as $filename)
+			$this->cleanFile($this->getPath($filename));
+	}
+	
+	private function cleanFile($path) {	
 		if(! is_file($path))
 			return true;
 		
