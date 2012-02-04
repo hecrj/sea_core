@@ -12,52 +12,44 @@ class Pagination
 	private $joins = array();
 	private $include = array();
 	private $order = 'id ASC';
-	private $actual_page;
-	private $total_pages;
+	private $results;
 	private $path;
+	private $active;
+	private $total;
+	private $start;
+	private $end;
 	
-	public function __construct(Request $request)
-	{		
-		$path = $request->getPath() .'/'. $request->get('pageFormat');
-		
-		if($path[0] != '/')
-			$path = '/'. $path;
-		
-		$this->path = $path;
-		$this->actual_page = $request->get('page');
+	public function __construct(Request $request) {
+		$this->path = $request->getPath() . '/' . $request->get('page_format');
+		$this->active = $request->get('page');
 	}
 	
-	public function model($model)
-	{
+	public function model($model) {
 		if(!isset($this->model))
 			$this->model = strval($model);
 			
 		return $this;
 	}
 	
-	public function limit($limit)
-	{
+	public function limit($limit) {
 		$this->limit = (int)$limit;
 		
 		return $this;
 	}
 	
-	public function conditions(Array $conditions)
-	{
+	public function conditions(Array $conditions) {
 		$this->conditions = $conditions;
 		
 		return $this;
 	}
 	
-	public function joins(Array $joins)
-	{
+	public function joins(Array $joins) {
 		$this->joins = $joins;
 		
 		return $this;
 	}
 	
-	public function through($item)
-	{
+	public function through($item) {
 		$model = $this->model;
 		$modelTable = $model::table()->table;
 		$modelColumn = strtolower($model);
@@ -83,29 +75,25 @@ class Pagination
 		return $this;
 	}
 	
-	public function includes(Array $include)
-	{
+	public function includes(Array $include) {
 		$this->include = $include;
 		
 		return $this;
 	}
 	
-	public function order($order)
-	{
+	public function order($order) {
 		$this->order = $order;
 		
 		return $this;
 	}
 	
-	public function page($page)
-	{
-		$this->actual_page = (int)$page;
+	public function page($page) {
+		$this->active = (int)$page;
 		
 		return $this;
 	}
 	
-	public function getResults()
-	{
+	public function init() {
 		// Set model var for parsing reasons
 		$model = $this->model;
 		
@@ -117,18 +105,21 @@ class Pagination
 		);
 		
 		// Calculate total pages
-		$this->total_pages = ceil( count( $model::all($count_options) ) / $this->limit );
+		$this->total = ceil( count( $model::all($count_options) ) / $this->limit );
 		
 		// If actual_page is false (0) or it's bigger than total pages
-		if(!$this->actual_page or $this->actual_page > $this->total_pages)
+		if(!$this->active or $this->active > $this->total)
 			// Set actual page to first page
-			$this->actual_page = 1;
+			$this->active = 1;
+		
+		// Set default page range
+		$this->range(3);
 		
 		// Calculate offset
-		$offset = ($this->actual_page - 1) * $this->limit;
+		$offset = ($this->active - 1) * $this->limit;
 		
 		// Return results
-		return $model::all(array(
+		$this->results = $model::all(array(
 			'conditions'	=>	$this->conditions,
 			'joins'			=>	$this->joins,
 			'include'		=>	$this->include,
@@ -136,74 +127,61 @@ class Pagination
 			'order'			=>	$this->order,
 			'offset'		=>	$offset
 		));
-	}
-	
-	public function path($path)
-	{
-		if(substr($path, 0, -1) != '/')
-			$path = $path . '/';
-		
-		$this->path = $path;
 		
 		return $this;
 	}
 	
-	public function render(Array $custom = null)
-	{	
-		$options = array('pages' => array(5, 5), 'previous' => PAGINATION_PREV, 'next' => PAGINATION_NEXT);
-		
-		if($custom)
-			$options = array_merge($options, $custom);
-		
-		echo '<div class="pagination">'."\n";
-		echo '  <ul>'."\n";
-		
-		$this->renderPreviousPages($options);
-		$this->renderPage($this->actual_page);
-		$this->renderNextPages($options);
-		
-		echo '  </ul>'."\n";
-		echo '</div>'."\n";
+	public function getResults() {
+		return $this->results;
 	}
 	
-	private function renderPage($number, $text = null)
-	{
-		echo '    <li';
+	public function range($start, $end = null) {
+		$this->start = $this->active - $start;
 		
-		if($this->actual_page == $number)
-			echo ' class="active"';
+		if($this->start <= 0)
+			$this->start = 1;
 		
-		echo '><a href="'. $this->path . $number. '">'. ($text ?: $number) .'</a></li>'."\n";
+		$this->end = $end === null ? $this->active + $start : $this->active + $end;
+		
+		if($this->end > $this->total)
+			$this->end = $this->total;
+		
+		return $this;
 	}
 	
-	private function renderPreviousPages($options)
-	{
-		if($this->actual_page != 1)
-			$this->renderPage($this->actual_page - 1, '&larr; '. $options['previous']);
-		
-		$page = $this->actual_page - $options['pages'][0];
-		
-		if($page < 0) $page = 1;
-		
-		while($page < $this->actual_page)
-		{
-			$this->renderPage($page);
-			
-			$page ++;
-		}
+	public function getPagePath($page) {
+		return $this->path . $page;
 	}
 	
-	private function renderNextPages($options)
-	{	
-		$pagesDiff = $this->actual_page + $options['pages'][1];
-		
-		if($pagesDiff > $this->total_pages) $pagesDiff = $this->total_pages;
-		
-		for($page = $this->actual_page + 1; $page <= $pagesDiff; $page ++)
-			$this->renderPage($page);
-		
-		if($this->actual_page != $this->total_pages)
-			$this->renderPage($this->actual_page + 1, $options['next'] .' &rarr;');
+	public function getPreviousPath() {
+		return $this->getPagePath($this->active - 1);
 	}
 	
+	public function getNextPath() {
+		return $this->getPagePath($this->active + 1);
+	}
+	
+	public function getPages() {
+		return range($this->start, $this->end);
+	}
+	
+	public function isActive($page) {
+		return $this->active == $page;
+	}
+	
+	public function hasPrevious() {
+		return $this->active > 1;
+	}
+	
+	public function hasNext() {
+		return $this->active < $this->total;
+	}
+	
+	public function hasPreviousHidden() {
+		return $this->start > 1;
+	}
+	
+	public function hasNextHidden() {
+		return $this->end < $this->total;
+	}
 }

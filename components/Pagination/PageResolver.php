@@ -27,7 +27,7 @@ class PageResolver extends ResolverAbstract
 		
 		$request->setPath($path);
 		$request->set('page', $page);
-		$request->set('pageFormat', $format);
+		$request->set('page_format', $format);
 		
 		// Controller data is not set yet
 		return false;
