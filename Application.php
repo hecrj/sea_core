@@ -52,7 +52,7 @@ class Application
 				$templating->render('exceptions/'. ($e->getCode() ? : '404'), array('e' => $e));
 			}
 			
-			catch (\Exception $e)
+			catch (\Exception $new)
 			{
 				echo '<h1>A critical error has occurred:</h1>';
 				echo '<p>'. $e->getMessage() .'</p>';
