@@ -11,7 +11,7 @@ class Pagination
 	private $conditions = array();
 	private $joins = array();
 	private $include = array();
-	private $order = 'id ASC';
+	private $order = 'id DESC';
 	private $results;
 	private $path;
 	private $active;
@@ -20,7 +20,7 @@ class Pagination
 	private $end;
 	
 	public function __construct(Request $request) {
-		$this->path = $request->getPath() . '/' . $request->get('page_format');
+		$this->path = $request->getPathFormatted() . '/' . $request->get('page_format');
 		$this->active = $request->get('page');
 	}
 	

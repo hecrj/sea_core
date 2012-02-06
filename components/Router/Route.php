@@ -51,6 +51,10 @@ class Route
 		return $this->path;
 	}
 	
+	public function getPathFormatted() {
+		return empty($this->path) ? '' : '/'. $this->path;
+	}
+	
 	public function setPath($path)
 	{
 		// Remove first / from the route

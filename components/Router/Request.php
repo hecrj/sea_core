@@ -67,6 +67,10 @@ class Request
 		return $this;
 	}
 	
+	public function getPathFormatted() {
+		return $this->route->getPathFormatted();
+	}
+	
 	public function getMethod()
 	{
 		return $this->method;
