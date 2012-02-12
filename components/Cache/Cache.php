@@ -16,15 +16,15 @@ class Cache extends CacheAbstract
 		$filenames = func_get_args();
 		
 		if(empty($filenames))
-			$this->cleanDirectory();
+			$this->cleanDirectory($this->getDir());
 		
 		else
 			$this->cleanFiles($filenames);
 	}
 	
-	private function cleanDirectory($dir = null) {
-		if($dir === null)
-			$dir = $this->getDir();
+	private function cleanDirectory($dir) {		
+		if(! is_dir($dir))
+			return true;
 		
 		$elements = scandir($dir);
 		
