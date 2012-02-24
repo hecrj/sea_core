@@ -1,30 +1,19 @@
 <?php
 
 namespace Core;
+use Core\Components\AutoloaderInterface;
+use App\Components\ComponentInjector;
+use Core\Components\Routing\RouterInterface;
 
 /**
- * FrontController class handles every request
- * 
- * @author Héctor Ramón Jiménez
+ * Application class handles every request
  */
 class Application
-{
-	private $classes;
-	private $autoloader;
-	private $injector;
-	private $controller;
-	private $request;
-	private $router;
+{	
+	public function __construct()
+	{}
 	
-	public function __construct(Array $classes)
-	{
-		$this->classes = $classes;
-	}
-	
-	/**
-	 * Creates basic application objects and starts application logic
-	 */
-	public function init()
+	public function init(AutoloaderInterface $autoloader)
 	{
 		ob_start();
 		
@@ -33,77 +22,68 @@ class Application
 			require(DIR . 'config/application.php');
 			require(DIR . 'config/boot.php');
 			
-			$this->initAutoloader();
+			$this->registerAutoloader($autoloader);
 			
-			$this->injector = new $this->classes['ComponentInjector'];
-			
-			$this->initRouter();
-			$this->initController();
-			$this->initTemplating();
+			$injector = $this->createComponentInjector();
+
+			$router = $injector->get('router');
+			$this->initRouter($router);
+
+			$request = $this->createRequest($injector->getClassName('request'));
+			$injector->set('request', $request);
+
+			$context = $router->getContext($request);
+			$injector->set('context', $context);
+
+			$controller = $router->getController($context);
+			$controller->setInjector($injector);
+			$controller->init($context->getActionName(), $context->getArguments());
+
+			$templating = $injector->get('templating');
+			$templating->render($controller->getView(), $controller->getData());
 		}
 		
 		catch (\Exception $e)
 		{
 			ob_clean();
 
-			$this->handleException($e);
+			$this->handleException($e, $injector);
 		}
 		
 		ob_end_flush();
  	}
 
-	private function initAutoloader()
+	private function registerAutoloader($autoloader)
 	{
-		require(DIR . 'core/components/Autoloader.php');
 		$vendors = require(DIR . 'config/vendors.php');
+		$autoloader->vendors($vendors);
 		
-		$this->autoloader = new $this->classes['Autoloader'];
-		$this->autoloader->vendors($vendors);
-		$this->autoloader->register();
+		$autoloader->register();
 	}
-	
-	private function initRouter()
-	{
-		$router = $this->injector->get('router');
-		$this->request = $this->getRequest();
-		
+
+	private function initRouter(RouterInterface $router)
+	{	
 		require(DIR . 'config/routes.php');
-		
-		$this->router = $router;
-	}
-	
-	private function getRequest()
-	{
-		$requestClass = $this->classes['Request'];
-		$request = $requestClass::createFromGlobals();
-		$this->injector->set('request', $request);
-		
-		return $request;
-	}
-	
-	private function initController()
-	{
-		$context = $this->router->getContext($this->request);
-		$this->injector->set('context', $context);
-
-		$controller = $this->router->getController($context);
-		$controller->setInjector($this->injector);
-		$controller->init($context->getActionName(), $context->getArguments());
-
-		$this->controller = $controller;
-	}
-	
-	private function initTemplating()
-	{
-		$templating = $this->injector->get('templating');
-		$templating->render($this->controller->getView(), $this->controller->getData());
 	}
 
-	private function handleException($e)
+	private function createComponentInjector()
+	{
+		return new ComponentInjector();
+	}
+
+	private function createRequest($requestClass)
+	{	
+		return $requestClass::createFromGlobals();
+	}
+
+	private function handleException($e, $injector = null)
 	{
 		try
 		{
-			$templating = $this->injector->get('templating');
+			if($injector === null)
+				throw $e;
+
+			$templating = $injector->get('templating');
 			$templating->clean();
 			$templating->render('exceptions/'. ($e->getCode() ? : '404'), array('e' => $e));
 		}
