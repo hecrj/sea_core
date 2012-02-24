@@ -1,7 +1,7 @@
 <?php
 
 namespace Core\Components;
-use Core\Components\Router\Request;
+use Core\Components\Routing\Request;
 
 ### Session component
 class Session

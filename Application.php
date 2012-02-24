@@ -11,7 +11,7 @@ class Application
 {
 	private $classes;
 	private $autoloader;
-	private $componentInjector;
+	private $injector;
 	private $controller;
 	private $request;
 	private $router;
@@ -23,8 +23,6 @@ class Application
 	
 	/**
 	 * Creates basic application objects and starts application logic
-	 * 
-	 * @param array $classes Collection of classes
 	 */
 	public function init()
 	{
@@ -33,32 +31,22 @@ class Application
 		try
 		{
 			require(DIR . 'config/application.php');
+			require(DIR . 'config/boot.php');
 			
 			$this->initAutoloader();
 			
-			$this->componentInjector = new $this->classes['ComponentInjector'];
+			$this->injector = new $this->classes['ComponentInjector'];
+			
 			$this->initRouter();
 			$this->initController();
+			$this->initTemplating();
 		}
 		
 		catch (\Exception $e)
 		{
 			ob_clean();
-			
-			try
-			{
-				$templating = $this->componentInjector->get('templating');
-				$templating->clean();
-				$templating->render('exceptions/'. ($e->getCode() ? : '404'), array('e' => $e));
-			}
-			
-			catch (\Exception $new)
-			{
-				echo '<h1>A critical error has occurred:</h1>';
-				echo '<p>'. $e->getMessage() .'</p>';
-				echo $e->getTraceAsString();
-			}
 
+			$this->handleException($e);
 		}
 		
 		ob_end_flush();
@@ -67,44 +55,65 @@ class Application
 	private function initAutoloader()
 	{
 		require(DIR . 'core/components/Autoloader.php');
+		$vendors = require(DIR . 'config/vendors.php');
+		
 		$this->autoloader = new $this->classes['Autoloader'];
-		
-		require(DIR . 'config/vendors.php');
-		foreach($vendors as $file => $path)
-			$this->autoloader->vendor($file, $path);
-		
-		require(DIR . 'config/boot.php');
+		$this->autoloader->vendors($vendors);
 		$this->autoloader->register();
 	}
 	
 	private function initRouter()
 	{
-		$this->router = $this->componentInjector->get('router');
-		$requestClass = $this->classes['Request'];
-		$this->request = $requestClass::createFromGlobals();
-		
-		$this->componentInjector->set('request', $this->request);
+		$router = $this->injector->get('router');
+		$this->request = $this->getRequest();
 		
 		require(DIR . 'config/routes.php');
-		$this->router->setRules($routeRules);
+		
+		$this->router = $router;
+	}
+	
+	private function getRequest()
+	{
+		$requestClass = $this->classes['Request'];
+		$request = $requestClass::createFromGlobals();
+		$this->injector->set('request', $request);
+		
+		return $request;
 	}
 	
 	private function initController()
 	{
-		$this->router->enroute($this->request);
-		
-		$moduleName = $this->request->get('moduleName');
-		$controllerName = $this->request->get('controllerName');
-		$controllerAction = $this->request->get('controllerAction');
-		
-		$controllerBaseClass = $this->classes['Controller'];
-		$controllerClass = $controllerBaseClass::getControllerClass($moduleName, $controllerName);
-		
-		$this->controller = new $controllerClass($this->componentInjector);
-		$this->controller->setView($moduleName .'/'. $controllerName . '/' . $controllerAction);
-		$this->controller->init($controllerAction, $this->request->get('controllerArguments'));
-		
-		$this->componentInjector->get('templating')->render($this->controller->getView(), $this->controller->getData());
+		$context = $this->router->getContext($this->request);
+		$this->injector->set('context', $context);
+
+		$controller = $this->router->getController($context);
+		$controller->setInjector($this->injector);
+		$controller->init($context->getActionName(), $context->getArguments());
+
+		$this->controller = $controller;
+	}
+	
+	private function initTemplating()
+	{
+		$templating = $this->injector->get('templating');
+		$templating->render($this->controller->getView(), $this->controller->getData());
+	}
+
+	private function handleException($e)
+	{
+		try
+		{
+			$templating = $this->injector->get('templating');
+			$templating->clean();
+			$templating->render('exceptions/'. ($e->getCode() ? : '404'), array('e' => $e));
+		}
+			
+		catch (\Exception $new)
+		{
+			echo '<h1>A critical error has occurred:</h1>';
+			echo '<p>'. $e->getMessage() .'</p>';
+			echo $e->getTraceAsString();
+		}
 	}
 	
 }

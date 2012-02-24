@@ -1,7 +1,7 @@
 <?php
 
 namespace Core\Helpers\Form;
-use Core\Components\Security, Core\Components\Router\Request;
+use Core\Components\Security, Core\Components\Routing\Request;
 use Core\Helpers\HTML\Tag;
 
 class Form extends Tag {

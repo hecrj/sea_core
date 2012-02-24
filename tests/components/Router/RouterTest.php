@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Components\Router;
+namespace Core\Components\Routing;
 
 use Core\Components\Request;
 

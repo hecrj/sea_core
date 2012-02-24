@@ -1,7 +1,8 @@
 <?php
 
 namespace Core\Components\Pagination;
-use Core\Components\Router\Request;
+use Core\Components\Routing\ContextInterface;
+use Core\Components\Routing\Generators\URLGeneratorInterface;
 
 # Pagination helper
 class Pagination
@@ -13,15 +14,21 @@ class Pagination
 	private $include = array();
 	private $order = 'id DESC';
 	private $results;
-	private $path;
 	private $active;
 	private $total;
 	private $start;
 	private $end;
+	private $path;
 	
-	public function __construct(Request $request) {
-		$this->path = $request->getPathFormatted() . '/' . $request->get('page_format');
-		$this->active = $request->get('page');
+	public function __construct(ContextInterface $context, URLGeneratorInterface $generator) {
+		$routeName = $context->getRouteName();
+
+		if($routeName === null)
+			throw new \RuntimeException('You need to declare the corresponding route before using Pagination.');
+
+		$arguments = $context->getArguments(array('page' => '%d'));
+
+		$this->path = $generator->generate($routeName, $arguments);
 	}
 	
 	public function model($model) {
@@ -150,7 +157,7 @@ class Pagination
 	}
 	
 	public function getPagePath($page) {
-		return $this->path . $page;
+		return sprintf($this->path, $page);
 	}
 	
 	public function getPreviousPath() {

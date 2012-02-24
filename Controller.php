@@ -1,7 +1,6 @@
 <?php
 
 namespace Core;
-use Core\Components\Router;
 use Core\Components\DynamicInjector;
 
 /**
@@ -23,11 +22,10 @@ abstract class Controller {
 	private $injector;
 	private $data = array();
     
-	public function __construct(DynamicInjector $injector)
-	{	
-		$class_name = get_class($this);
-		$this->name = strtolower(substr($class_name, strrpos($class_name, '\\')+1, -10));
-		$this->injector = $injector;
+	public function __construct($name, $module = null)
+	{
+		$this->name = lcfirst($name);
+		$this->module = $module;
 	}
 	
 	public function __set($key, $value)
@@ -40,8 +38,17 @@ abstract class Controller {
 		return $this->data[$key];
 	}
 	
+	public function setInjector(DynamicInjector $injector)
+	{
+		$this->injector = $injector;
+		
+		return $this;
+	}
+	
 	public function init($action, Array $arguments)
 	{	
+		$this->setDefaultView($action);
+		
 		$reflection = new \ReflectionMethod($this, $action);
 		
 		if($reflection->isPublic())
@@ -51,8 +58,18 @@ abstract class Controller {
 		
 	}
 	
-	private function call($reflection, $arguments)
+	private function setDefaultView($action)
 	{
+		$view = $this->name .'/'. $action;
+		
+		if($this->module !== null)
+			$view = $this->module .'/'. $view;
+		
+		$this->setView($view);
+	}
+	
+	private function call($reflection, $arguments)
+	{	
 		if($this->before_filter)
 			$this->callbacksFor($this->before_filter);
 		
@@ -105,6 +122,8 @@ abstract class Controller {
 			throw new \RuntimeException('There are too much arguments in the route for the action <strong>'. $action .
 					'</strong> in <strong>'. get_class($this) . '</strong>');
 		
+		$arguments = array_values($arguments);
+
 		// Switch to avoid call_user_func_array
 		switch ($num_args)
 		{
@@ -157,10 +176,4 @@ abstract class Controller {
 				$this->$key();
 		}
 	}
-	
-	public static function getControllerClass($moduleName, $controllerName)
-	{
-		return 'App\\Controllers\\' . ucfirst($moduleName) . '\\' . ucfirst($controllerName) . 'Controller';
-	}
-	
 }

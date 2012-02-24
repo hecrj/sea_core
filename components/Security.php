@@ -2,7 +2,7 @@
 
 namespace Core\Components;
 use Core\Components\Session;
-use Core\Components\Router\Request;
+use Core\Components\Routing\Request;
 
 # Security component
 class Security

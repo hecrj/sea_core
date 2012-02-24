@@ -43,6 +43,11 @@ class Autoloader
 		$this->namespaces[$namespace] = $path;
 	}
 	
+	public function vendors(Array $vendors) {
+		foreach($vendors as $file => $path)
+			$this->vendor($file, $path);
+	}
+	
 	public function vendor($file, $path)
 	{
 		if(! is_file(DIR . 'vendor/'. $path .'/'. $file .'.php'))
