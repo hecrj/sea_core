@@ -2,8 +2,10 @@
 
 namespace Core\Components;
 
+require_once(DIR . 'core/components/AutoloaderInterface.php');
+
 # Autoloader class
-class Autoloader
+class Autoloader implements AutoloaderInterface
 {
 	private $namespaces = array();
 	
