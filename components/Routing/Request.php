@@ -52,7 +52,10 @@ class Request implements RequestInterface
 			$this->hostname  = $host_parts[1];
 		}
 		else
+		{
+			$this->subdomain = 'www';
 			$this->hostname  = $host;
+		}
 		
 		return $this;
 	}
