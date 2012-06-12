@@ -46,7 +46,7 @@ class Router implements RouterInterface
 
 	public function getModuleSubdomain($moduleName)
 	{
-		if($module === null)
+		if($moduleName === null)
 			return 'www';
 		
 		if(! array_key_exists($moduleName, $this->modules))

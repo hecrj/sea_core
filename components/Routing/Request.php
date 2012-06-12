@@ -25,8 +25,12 @@ class Request implements RequestInterface
 	}
 	
 	public static function createFromGlobals()
-	{	
-		$ajax = ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
+	{
+		$ajax = false;
+
+		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']))
+			$ajax = ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
+
 		$secure = !empty($_SERVER['HTTPS']);
 		
 		$request = new self;
@@ -72,13 +76,18 @@ class Request implements RequestInterface
 	
 	public function setPath($path)
 	{
-		// Add first / to the route
-		if($path[0] != '/')
-			$path = '/'. $path;
-		
-		// Remove last / from the route
-		if(substr($path, -1) == '/')
-			$path = substr($path, 0, -1);
+		if(empty($path))
+			$path = '/';
+		else
+		{
+			// Add first / to the route
+			if($path[0] != '/')
+				$path = '/'. $path;
+			
+			// Remove last / from the route
+			if(substr($path, -1) == '/')
+				$path = substr($path, 0, -1);
+		}
 		
 		$this->path = $path;
 		
