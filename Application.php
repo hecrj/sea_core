@@ -26,16 +26,16 @@ class Application
 			
 			$injector = $this->createComponentInjector();
 
-			$router = $injector->get('router');
-			$this->initRouter($router);
-
 			$request = $this->createRequest($injector->getClassName('request'));
 			$injector->set('request', $request);
+
+			$router = $injector->get('router');
+			$this->initRouter($router);
 
 			$context = $router->getContext($request);
 			$injector->set('context', $context);
 
-			$controller = $router->getController($context);
+			$controller = $context->getController();
 			$controller->setInjector($injector);
 			$controller->init($context->getActionName(), $context->getArguments());
 

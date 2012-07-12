@@ -62,19 +62,4 @@ class Router implements RouterInterface
 		return $this->resolvers->getContext($request, $routes);
 	}
 
-	public function getController(ContextInterface $context)
-	{
-		$controllerClass = 'App\\Controllers\\';
-
-		$moduleName = $context->getModuleName();
-
-		if(null !== $moduleName)
-			$controllerClass .= $moduleName .'\\';
-		
-		$controllerName = $context->getControllerName();
-		$controllerClass .= $controllerName .'Controller';
-
-		return new $controllerClass($controllerName, $moduleName);
-	}
-
 }

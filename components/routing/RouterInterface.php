@@ -7,5 +7,4 @@ interface RouterInterface
 {
 	public function addRoutes($subdomain, RouteCollectionInterface $routes);
 	public function getContext(RequestInterface $request);
-	public function getController(ContextInterface $context);
 }

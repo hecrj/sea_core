@@ -5,6 +5,7 @@ namespace Core\Components\Routing;
 class Context implements ContextInterface
 {
 	private $moduleName;
+	private $controller;
 	private $controllerName;
 	private $actionName;
 	private $arguments;
@@ -13,6 +14,7 @@ class Context implements ContextInterface
 	public function __construct($controllerName, $actionName, Array $arguments, $moduleName = null, $routeName = null)
 	{
 		$this->moduleName = $moduleName;
+		$this->controller = null;
 		$this->controllerName = $controllerName;
 		$this->actionName = $actionName;
 		$this->arguments = $arguments;
@@ -22,6 +24,14 @@ class Context implements ContextInterface
 	public function getModuleName()
 	{
 		return $this->moduleName;
+	}
+
+	public function getController()
+	{
+		if($this->controller === null)
+			$this->controller = $this->createController();
+
+		return $this->controller;
 	}
 
 	public function getControllerName()
@@ -47,5 +57,17 @@ class Context implements ContextInterface
 	public function getRouteName()
 	{
 		return $this->routeName;
+	}
+
+	private function createController()
+	{
+		$controllerClass = 'App\\Controllers\\';
+
+		if(null !== $this->moduleName)
+			$controllerClass .= $this->moduleName .'\\';
+		
+		$controllerClass .= $this->controllerName .'Controller';
+
+		return new $controllerClass($this->controllerName, $this->moduleName);
 	}
 }
