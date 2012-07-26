@@ -30,7 +30,7 @@ class Application
 			$injector->set('request', $request);
 
 			$router = $injector->get('router');
-			$this->initRouter($router);
+			$router->loadRoutes('config/routes.php');
 
 			$context = $router->getContext($request);
 			$injector->set('context', $context);
@@ -59,11 +59,6 @@ class Application
 		$autoloader->vendors($vendors);
 		
 		$autoloader->register();
-	}
-
-	private function initRouter(RouterInterface $router)
-	{	
-		require(DIR . 'config/routes.php');
 	}
 
 	private function createComponentInjector()

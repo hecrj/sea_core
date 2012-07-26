@@ -26,6 +26,16 @@ class Router implements RouterInterface
 		
 		return $this;
 	}
+
+	public function loadRoutes($routesPath)
+	{
+		$routes = require(DIR . $routesPath);
+
+		foreach($routes as $subdomain => $collection)
+		{
+			$this->addRoutes($subdomain, $collection);
+		}
+	}
 	
 	private function getSubdomainRoutes($subdomain)
 	{	
