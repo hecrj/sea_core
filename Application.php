@@ -1,9 +1,9 @@
 <?php
 
-namespace Core;
-use Core\Components\AutoloaderInterface;
-use App\Components\ComponentInjector;
-use Core\Components\Routing\RouterInterface;
+namespace Sea\Core;
+use Sea\Core\Components\AutoloaderInterface;
+use Sea\App\Components\ComponentInjector;
+use Sea\Core\Components\Routing\RouterInterface;
 
 /**
  * Application class handles every request

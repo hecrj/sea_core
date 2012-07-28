@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Helpers\Form\Fields;
+namespace Sea\Core\Helpers\Form\Fields;
 
 class Textarea extends Field {
 	static $tagName = 'textarea';

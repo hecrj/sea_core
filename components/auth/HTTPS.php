@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Components\Auth;
+namespace Sea\Core\Components\Auth;
 
 class HTTPS extends ProtocolAbstract
 {

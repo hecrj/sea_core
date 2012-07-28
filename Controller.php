@@ -1,7 +1,7 @@
 <?php
 
-namespace Core;
-use Core\Components\DynamicInjector;
+namespace Sea\Core;
+use Sea\Core\Components\DynamicInjector;
 
 /**
  * Abstract controller class to use as base for all application controllers.

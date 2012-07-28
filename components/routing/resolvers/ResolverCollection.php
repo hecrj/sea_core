@@ -1,8 +1,8 @@
 <?php
 
-namespace Core\Components\Routing\Resolvers;
-use Core\Components\Routing\RequestInterface;
-use Core\Components\Routing\Routes\RouteCollectionInterface;
+namespace Sea\Core\Components\Routing\Resolvers;
+use Sea\Core\Components\Routing\RequestInterface;
+use Sea\Core\Components\Routing\Routes\RouteCollectionInterface;
 
 class ResolverCollection implements ResolverCollectionInterface
 {
@@ -34,7 +34,7 @@ class ResolverCollection implements ResolverCollectionInterface
 
 	private function createController($info, $module)
 	{
-		$controllerClass = 'App\\Controllers\\';
+		$controllerClass = 'Sea\\App\\Controllers\\';
 		
 		if(!empty($module))
 			$controllerClass .= ucfirst($module).'\\';

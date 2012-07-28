@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Components\Templating;
+namespace Sea\Core\Components\Templating;
 
 /**
  * A very simple template finder.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Components\Routing\Generators;
+namespace Sea\Core\Components\Routing\Generators;
 
 interface URLGeneratorInterface
 {

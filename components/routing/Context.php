@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Components\Routing;
+namespace Sea\Core\Components\Routing;
 
 class Context implements ContextInterface
 {
@@ -61,10 +61,10 @@ class Context implements ContextInterface
 
 	private function createController()
 	{
-		$controllerClass = 'App\\Controllers\\';
+		$controllerClass = 'Sea\\App\\Controllers\\';
 
 		if(null !== $this->moduleName)
-			$controllerClass .= $this->moduleName .'\\';
+			$controllerClass .= ucfirst($this->moduleName) .'\\';
 		
 		$controllerClass .= $this->controllerName .'Controller';
 

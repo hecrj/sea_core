@@ -1,8 +1,8 @@
 <?php
 
-namespace Core\Helpers\Form;
-use Core\Components\Security, Core\Components\Routing\Request;
-use Core\Helpers\HTML\Tag;
+namespace Sea\Core\Helpers\Form;
+use Sea\Core\Components\Security, Core\Components\Routing\Request;
+use Sea\Core\Helpers\HTML\Tag;
 
 class Form extends Tag {
 	static $tagName = 'form';

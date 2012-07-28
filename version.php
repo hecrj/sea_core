@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace Sea\Core;
 
 const MAJOR	=	1;
 const MINOR	=	0;

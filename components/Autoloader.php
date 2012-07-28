@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Components;
+namespace Sea\Core\Components;
 
 require_once(DIR . 'core/components/AutoloaderInterface.php');
 
@@ -24,8 +24,14 @@ class Autoloader implements AutoloaderInterface
 			$namespaces = explode('\\', $name);
 			$class_name = array_pop($namespaces);
 			
-			if(isset($this->namespaces[$namespaces[0]]))
+			if($namespaces[0] == 'Sea')
+			{
+				array_shift($namespaces);
+			}
+			else if(isset($this->namespaces[$namespaces[0]]))
+			{
 				$namespaces[0] = $this->namespaces[$namespaces[0]];
+			}
 			
 			$path = strtolower(implode(DIRECTORY_SEPARATOR, $namespaces)) . DIRECTORY_SEPARATOR . $class_name. '.php';
 		}

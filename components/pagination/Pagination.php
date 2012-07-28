@@ -1,8 +1,8 @@
 <?php
 
-namespace Core\Components\Pagination;
-use Core\Components\Routing\ContextInterface;
-use Core\Components\Routing\Generators\URLGeneratorInterface;
+namespace Sea\Core\Components\Pagination;
+use Sea\Core\Components\Routing\ContextInterface;
+use Sea\Core\Components\Routing\Generators\URLGeneratorInterface;
 
 # Pagination helper
 class Pagination

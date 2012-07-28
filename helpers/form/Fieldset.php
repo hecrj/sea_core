@@ -1,8 +1,8 @@
 <?php
 
-namespace Core\Helpers\Form;
-use Core\Helpers\HTML\Tag;
-use Core\Model;
+namespace Sea\Core\Helpers\Form;
+use Sea\Core\Helpers\HTML\Tag;
+use Sea\Core\Model;
 
 class Fieldset extends Tag {
 	static $tagName = 'fieldset';

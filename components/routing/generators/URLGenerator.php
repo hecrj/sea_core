@@ -1,9 +1,9 @@
 <?php
 
-namespace Core\Components\Routing\Generators;
-use Core\Components\Routing\RouterInterface;
-use Core\Components\Routing\Routes\RouteCompilerInterface;
-use Core\Components\Routing\ContextInterface;
+namespace Sea\Core\Components\Routing\Generators;
+use Sea\Core\Components\Routing\RouterInterface;
+use Sea\Core\Components\Routing\Routes\RouteCompilerInterface;
+use Sea\Core\Components\Routing\ContextInterface;
 
 class URLGenerator implements URLGeneratorInterface
 {

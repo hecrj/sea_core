@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Components\Cache;
+namespace Sea\Core\Components\Cache;
 
 /**
  * Cache component to use in controllers.

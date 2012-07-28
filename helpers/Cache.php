@@ -1,8 +1,8 @@
 <?php
 
-namespace Core\Helpers;
-use Core\Components\Cache\CacheAbstract;
-use Core\Components\Templating\Engine;
+namespace Sea\Core\Helpers;
+use Sea\Core\Components\Cache\CacheAbstract;
+use Sea\Core\Components\Templating\Engine;
 
 class Cache extends CacheAbstract
 {

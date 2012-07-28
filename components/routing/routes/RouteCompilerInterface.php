@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Components\Routing\Routes;
+namespace Sea\Core\Components\Routing\Routes;
 
 interface RouteCompilerInterface
 {

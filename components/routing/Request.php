@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Components\Routing;
+namespace Sea\Core\Components\Routing;
 
 /**
  * Request class represents an HTTP/S request.

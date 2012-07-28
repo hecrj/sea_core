@@ -1,9 +1,9 @@
 <?php
 
-namespace Core\Components\Routing\Resolvers;
-use Core\Components\Routing\RequestInterface;
-use Core\Components\Routing\Routes\RouteCompilerInterface;
-use Core\Components\Routing\Routes\RouteCollectionInterface;
+namespace Sea\Core\Components\Routing\Resolvers;
+use Sea\Core\Components\Routing\RequestInterface;
+use Sea\Core\Components\Routing\Routes\RouteCompilerInterface;
+use Sea\Core\Components\Routing\Routes\RouteCollectionInterface;
 
 class MatchResolver extends ResolverAbstract
 {

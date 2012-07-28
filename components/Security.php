@@ -1,8 +1,8 @@
 <?php
 
-namespace Core\Components;
-use Core\Components\Session;
-use Core\Components\Routing\Request;
+namespace Sea\Core\Components;
+use Sea\Core\Components\Session;
+use Sea\Core\Components\Routing\Request;
 
 # Security component
 class Security

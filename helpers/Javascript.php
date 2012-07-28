@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Helpers;
+namespace Sea\Core\Helpers;
 
 class Javascript
 {
