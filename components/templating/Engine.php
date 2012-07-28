@@ -130,7 +130,7 @@ class Engine
 		}
 		catch(\Exception $e)
 		{
-			$exceptionView = DIR . 'app/views/exceptions/block.html.php';
+			$exceptionView = \Sea\DIR . 'app/views/exceptions/block.html.php';
 			
 			if(is_file($exceptionView))
 				require($exceptionView);

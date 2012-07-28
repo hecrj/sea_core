@@ -29,7 +29,7 @@ class Router implements RouterInterface
 
 	public function loadRoutes($routesPath)
 	{
-		$routes = require(DIR . $routesPath);
+		$routes = require(\Sea\DIR . $routesPath);
 
 		foreach($routes as $subdomain => $collection)
 		{

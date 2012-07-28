@@ -15,6 +15,6 @@ class Finder
 	
 	public function getPath($template)
 	{
-		return DIR . 'app/views/'. $template .'.html.php';
+		return \Sea\DIR . 'app/views/'. $template .'.html.php';
 	}
 }

@@ -2,7 +2,7 @@
 
 namespace Sea\Core\Components;
 
-require_once(DIR . 'core/components/AutoloaderInterface.php');
+require_once(\Sea\DIR . 'core/components/AutoloaderInterface.php');
 
 # Autoloader class
 class Autoloader implements AutoloaderInterface
@@ -38,10 +38,10 @@ class Autoloader implements AutoloaderInterface
 		else
 			$path = 'app/models/'.$name.'.php';
 		
-		if(! is_file(DIR . $path))
+		if(! is_file(\Sea\DIR . $path))
 			throw new \Exception('Unable to load class: <strong>'. $name .'</strong>', 404);
 		
-		require(DIR . $path);
+		require(\Sea\DIR . $path);
 		
 		return true;
 	}
@@ -58,13 +58,13 @@ class Autoloader implements AutoloaderInterface
 	
 	public function vendor($file, $path)
 	{
-		if(! is_file(DIR . 'vendor/'. $path .'/'. $file .'.php'))
+		if(! is_file(\Sea\DIR . 'vendor/'. $path .'/'. $file .'.php'))
 			throw new \InvalidArgumentException('Vendor main file not found in: vendor/'. $path .'/'. $file.'.php');
 		
-		require(DIR . 'vendor/'. $path .'/'. $file .'.php');
+		require(\Sea\DIR . 'vendor/'. $path .'/'. $file .'.php');
 		
-		if(is_file(DIR . 'config/vendor/'. $file .'.php'))
-			require(DIR . 'config/vendor/'. $file .'.php');
+		if(is_file(\Sea\DIR . 'config/vendor/'. $file .'.php'))
+			require(\Sea\DIR . 'config/vendor/'. $file .'.php');
 				
 		return true;
 	}

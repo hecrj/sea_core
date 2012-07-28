@@ -18,7 +18,7 @@ abstract class CacheAbstract
 		//if(substr($dir, -1) == '/')
 		//	$dir = substr($dir, 0, -1);
 		
-		$this->dir = DIR .'cache/'. $dir;
+		$this->dir = \Sea\DIR .'cache/'. $dir;
 		
 		return $this;
 	}

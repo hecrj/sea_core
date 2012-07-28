@@ -19,8 +19,8 @@ class Application
 		
 		try
 		{
-			require(DIR . 'config/application.php');
-			require(DIR . 'config/boot.php');
+			require(\Sea\DIR . 'config/application.php');
+			require(\Sea\DIR . 'config/boot.php');
 			
 			$this->registerAutoloader($autoloader);
 			
@@ -55,7 +55,7 @@ class Application
 
 	private function registerAutoloader($autoloader)
 	{
-		$vendors = require(DIR . 'config/vendors.php');
+		$vendors = require(\Sea\DIR . 'config/vendors.php');
 		$autoloader->vendors($vendors);
 		
 		$autoloader->register();
