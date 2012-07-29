@@ -27,14 +27,10 @@ class Router implements RouterInterface
 		return $this;
 	}
 
-	public function loadRoutes($routesPath)
+	public function setRoutes(Array $routes)
 	{
-		$routes = require(\Sea\DIR . $routesPath);
-
 		foreach($routes as $subdomain => $collection)
-		{
 			$this->addRoutes($subdomain, $collection);
-		}
 	}
 	
 	private function getSubdomainRoutes($subdomain)

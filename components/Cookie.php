@@ -19,7 +19,7 @@ class Cookie
 		$value = base64_encode(serialize($value));
 		
 		// Create cookie
-		setcookie($name, $value, $time ? time()+$time : 0, $path, '.'.WEB_DOMAIN, $secure, $httponly);
+		setcookie($name, $value, $time ? time()+$time : 0, $path, '.'. Cookie\DOMAIN, $secure, $httponly);
 		
 		// Add value to data
 		$this->data[$name] = $value;
@@ -31,7 +31,7 @@ class Cookie
 		if($this->exists($name))
 		{
 			// Delete cookie
-			setcookie($name, '', 0, '/', '.'.WEB_DOMAIN);
+			setcookie($name, '', 0, '/', '.'. Cookie\DOMAIN);
 			
 			// Unset the data
 			unset($this->data[$name]);

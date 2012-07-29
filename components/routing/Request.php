@@ -35,7 +35,7 @@ class Request implements RequestInterface
 		
 		$request = new self;
 		$request->setHost($_SERVER['HTTP_HOST'])
-				->setPath($_SERVER[ROUTE_PROTOCOL])
+				->setPath($_SERVER[PROTOCOL])
 				->setSecure($secure)
 				->setMethod($_SERVER['REQUEST_METHOD'])
 				->setAjax($ajax)

@@ -1,36 +1,28 @@
 <?php
 
 namespace Sea\Core;
-use Sea\Core\Components\AutoloaderInterface;
 use Sea\App\Components\ComponentInjector;
-use Sea\Core\Components\Routing\RouterInterface;
-
+use Sea\Core\Components\Routing\Request;
 /**
  * Application class handles every request
  */
 class Application
-{	
+{
 	public function __construct()
-	{}
-	
-	public function init(AutoloaderInterface $autoloader)
 	{
-		ob_start();
-		
-		try
-		{
-			require(\Sea\DIR . 'config/application.php');
-			require(\Sea\DIR . 'config/boot.php');
-			
-			$this->registerAutoloader($autoloader);
-			
-			$injector = $this->createComponentInjector();
+	}
 
-			$request = $this->createRequest($injector->getClassName('request'));
+ 	public function respond(Request $request, Array $routes)
+ 	{
+ 		ob_start();
+
+ 		try
+		{
+			$injector = new ComponentInjector();
 			$injector->set('request', $request);
 
 			$router = $injector->get('router');
-			$router->loadRoutes('config/routes.php');
+			$router->setRoutes($routes);
 
 			$context = $router->getContext($request);
 			$injector->set('context', $context);
@@ -49,27 +41,9 @@ class Application
 
 			$this->handleException($e, $injector);
 		}
-		
+
 		ob_end_flush();
  	}
-
-	private function registerAutoloader($autoloader)
-	{
-		$vendors = require(\Sea\DIR . 'config/vendors.php');
-		$autoloader->vendors($vendors);
-		
-		$autoloader->register();
-	}
-
-	private function createComponentInjector()
-	{
-		return new ComponentInjector();
-	}
-
-	private function createRequest($requestClass)
-	{	
-		return $requestClass::createFromGlobals();
-	}
 
 	private function handleException($e, $injector = null)
 	{

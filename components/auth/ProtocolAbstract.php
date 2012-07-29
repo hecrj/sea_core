@@ -65,7 +65,7 @@ abstract class ProtocolAbstract
 		if(! $user = $user_class::find(array('username' => $cookie_data['username'])))
 			return false;
 		
-		$key = hash_hmac($this->algo, $cookie_data['username'] . $cookie_data['created'], SERVER_KEY);
+		$key = hash_hmac($this->algo, $cookie_data['username'] . $cookie_data['created'], KEY_SERVER);
 		$hash = hash_hmac($this->algo, $cookie_data['username'] . $cookie_data['created'] . $user->salt, $key);
 		
 		if($cookie_data['hash'] != $hash)
@@ -80,7 +80,7 @@ abstract class ProtocolAbstract
 		$time = time();
 
 		// Create a key
-		$key = hash_hmac($this->algo, $user->username . $time, SERVER_KEY);
+		$key = hash_hmac($this->algo, $user->username . $time, KEY_SERVER);
 		
 		// Set user data
 		$user_data = array(

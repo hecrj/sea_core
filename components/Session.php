@@ -15,7 +15,7 @@ class Session
 	{
 		$this->cookie = $cookie;
 		$this->secure = $request->isSecure();
-		$this->name = $this->secure ? SESSION_SECURE : SESSION_NAME;
+		$this->name = $this->secure ? Session\NAME : Session\NAME_SECURE;
 		
 		$this->init();
 	}
@@ -31,7 +31,7 @@ class Session
 		session_name($this->name);
 		
 		// Configure sessions
-		session_set_cookie_params(0, '/', '.'.WEB_DOMAIN, $this->secure);
+		session_set_cookie_params(0, '/', '.'. Session\DOMAIN, $this->secure);
 		
 		// Initialize sessions
 		session_start();

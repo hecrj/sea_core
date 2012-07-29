@@ -1,7 +1,8 @@
 <?php
 
 namespace Sea\Core\Helpers\Form;
-use Sea\Core\Components\Security, Core\Components\Routing\Request;
+use Sea\Core\Components\Security;
+use Sea\Core\Components\Routing\Request;
 use Sea\Core\Helpers\HTML\Tag;
 
 class Form extends Tag {

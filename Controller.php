@@ -103,7 +103,7 @@ abstract class Controller {
 			
 			$request = $this->get('request');
 			
-			$request->redirectTo(AUTH_LOGIN.'/'.base64_encode('/'.$request->getPath()));
+			$request->redirectTo(Components\Auth\URI_LOGIN . '/' . base64_encode('/'.$request->getPath()));
 		}
 	}
 	
@@ -116,7 +116,8 @@ abstract class Controller {
 		$num_args = count($arguments);
 		
 		if($num_req_params > $num_args)
-			$num_args = $num_req_params;
+			throw new \RuntimeException('There are too few arguments in the route for the action <strong>'. $action .
+					'</strong> in <strong>'. get_class($this) . '</strong>');
 		
 		elseif($num_params < $num_args)
 			throw new \RuntimeException('There are too much arguments in the route for the action <strong>'. $action .
