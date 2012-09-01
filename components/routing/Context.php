@@ -66,7 +66,7 @@ class Context implements ContextInterface
 		if(null !== $this->moduleName)
 			$controllerClass .= ucfirst($this->moduleName) .'\\';
 		
-		$controllerClass .= $this->controllerName .'Controller';
+		$controllerClass .= ucfirst($this->controllerName) .'Controller';
 
 		return new $controllerClass($this->controllerName, $this->moduleName);
 	}
