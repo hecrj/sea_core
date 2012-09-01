@@ -31,8 +31,8 @@ class Route implements RouteInterface
 		return $this->controller;
 	}
 	
-	public function addDefault($name, $value) {
-		$this->defaults[$name] = $value;
+	public function defaults(Array $defaults) {
+		$this->defaults[] = $defaults;
 		
 		return $this;
 	}
@@ -46,18 +46,18 @@ class Route implements RouteInterface
 		return $this->defaults[$name];
 	}
 	
-	public function addRequirement($name, $value) {
-		$this->requirements[$name] = $value;
+	public function constraints(Array $constraints) {
+		$this->requirements[] = $constraints;
 		
 		return $this;
 	}
 
-	public function hasRequirement($name)
+	public function hasConstraint($name)
 	{
 		return array_key_exists($name, $this->requirements);
 	}
 
-	public function getRequirement($name) {
+	public function getConstraint($name) {
 		return $this->requirements[$name];
 	}
 }

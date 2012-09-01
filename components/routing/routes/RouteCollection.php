@@ -17,7 +17,7 @@ class RouteCollection implements RouteCollectionInterface
 		return $this->moduleName;
 	}
 	
-	public function addRoute($name, $pattern = '/', $controller)
+	public function match($name, $pattern = '/', $controller)
 	{
 		$route = new Route($this->moduleName .'/'. $name, $pattern, $controller);
 		$this->routes[$name] = $route;

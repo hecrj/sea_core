@@ -58,7 +58,7 @@ class RouteCompiler implements RouteCompilerInterface
 
 	private function isArgument($part)
 	{
-		return ($part[0] == ':');
+		return (!empty($part) and $part[0] == ':');
 	}
 
 	private function addArgument($route, $part, $compiled)
@@ -66,8 +66,8 @@ class RouteCompiler implements RouteCompilerInterface
 		$variable = substr($part, 1);
 		$compiled->addArgument($variable);
 
-		if($route->hasRequirement($variable))
-			$regexp = '(?P<'. $variable .'>'. $route->getRequirement($variable) .')';
+		if($route->hasConstraint($variable))
+			$regexp = '(?P<'. $variable .'>'. $route->getConstraint($variable) .')';
 		else
 			$regexp = '(?P<'. $variable .'>[a-z0-9-]+)';
 

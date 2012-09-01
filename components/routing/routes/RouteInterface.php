@@ -7,10 +7,10 @@ interface RouteInterface
 	public function getName();
 	public function getPattern();
 	public function getController();
-	public function addDefault($name, $value);
+	public function defaults(Array $defaults);
 	public function hasDefault($name);
 	public function getDefault($name);
-	public function addRequirement($name, $value);
-	public function hasRequirement($name);
-	public function getRequirement($name);
+	public function constraints(Array $constraints);
+	public function hasConstraint($name);
+	public function getConstraint($name);
 }

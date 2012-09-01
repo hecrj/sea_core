@@ -28,7 +28,7 @@ class MatchResolver extends ResolverAbstract
 			if(! preg_match($compiled->getRegexp(), $path, $matches))
 				continue;
 			
-			list($controllerName, $actionName) = explode(':', $route->getController(), 2);
+			list($controllerName, $actionName) = explode('#', $route->getController(), 2);
 			$arguments = $this->mergeArguments($matches, $compiled);
 
 			$contextClass = $this->contextClass;

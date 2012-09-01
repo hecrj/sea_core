@@ -29,18 +29,6 @@ class ResolverCollection implements ResolverCollectionInterface
 				return $context;
 		}
 
-		return null;
-	}
-
-	private function createController($info, $module)
-	{
-		$controllerClass = 'Sea\\App\\Controllers\\';
-		
-		if(!empty($module))
-			$controllerClass .= ucfirst($module).'\\';
-		
-		$controllerClass .= $info['controller'] .'Controller';
-		
-		return new $controllerClass($info['controller'], $module);
+		throw new \RuntimeException('Impossible to find a Context for the current Request.');
 	}
 }

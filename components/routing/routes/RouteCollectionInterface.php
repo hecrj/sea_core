@@ -6,7 +6,7 @@ interface RouteCollectionInterface
 {
 	public function __construct($module = null);
 	public function getModuleName();
-	public function addRoute($name, $pattern, $controller);
+	public function match($name, $pattern, $controller);
 	public function hasRoute($name);
 	public function getRoute($name);
 	public function getRoutes();
