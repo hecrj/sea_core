@@ -18,7 +18,7 @@ class Cache extends CacheAbstract
 	{
 		$path = $this->getPath($cacheFile);
 		
-		if(! is_file($path))
+		if(Cache\EMULATE == TRUE or !is_file($path))
 			return false;
 		
 		include($path);
@@ -131,7 +131,7 @@ class Cache extends CacheAbstract
 	private function writeCacheFile($filename, $content)
 	{
 		$path = $this->getPath($filename);
-		
+
 		return @file_put_contents($path, $content, LOCK_EX) !== false;
 	}
 }
