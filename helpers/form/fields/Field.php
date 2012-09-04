@@ -1,7 +1,7 @@
 <?php
 
-namespace Sea\Core\Helpers\Form\Fields;
-use Sea\Core\Helpers\HTML\Tag;
+namespace Sea\Helpers\Form\Fields;
+use Sea\Helpers\HTML\Tag;
 
 abstract class Field extends Tag {
 	private $label;

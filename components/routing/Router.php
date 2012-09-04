@@ -1,8 +1,8 @@
 <?php
 
-namespace Sea\Core\Components\Routing;
-use Sea\Core\Components\Routing\Resolvers\ResolverCollectionInterface;
-use Sea\Core\Components\Routing\Routes\RouteCollectionInterface;
+namespace Sea\Components\Routing;
+use Sea\Components\Routing\Resolvers\ResolverCollectionInterface;
+use Sea\Components\Routing\Routes\RouteCollectionInterface;
 
 class Router implements RouterInterface
 {

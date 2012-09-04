@@ -1,6 +1,6 @@
 <?php
 
-namespace Sea\Core\Components\Routing;
+namespace Sea\Components\Routing;
 
 interface RequestInterface
 {

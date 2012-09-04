@@ -1,7 +1,7 @@
 <?php
 
-namespace Sea\Core\Components\Cache;
-use Sea\Core\Model;
+namespace Sea\Components\Cache;
+use Sea\Model;
 
 /**
  * Abstract Cache class.

@@ -1,7 +1,7 @@
 <?php
 
-namespace Sea\Core\Helpers\Form\Buttons;
-use Sea\Core\Helpers\HTML\Tag;
+namespace Sea\Helpers\Form\Buttons;
+use Sea\Helpers\HTML\Tag;
 
 class Button extends Tag {
 	static $tagName = 'button';

@@ -1,8 +1,8 @@
 <?php
 
-namespace Sea\Core\Components\Routing\Resolvers;
-use Sea\Core\Components\Routing\RequestInterface;
-use Sea\Core\Components\Routing\Routes\RouteCollectionInterface;
+namespace Sea\Components\Routing\Resolvers;
+use Sea\Components\Routing\RequestInterface;
+use Sea\Components\Routing\Routes\RouteCollectionInterface;
 
 interface ResolverCollectionInterface
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Sea\Core\Helpers\Form;
-use Sea\Core\Components\Security;
-use Sea\Core\Components\Routing\Request;
-use Sea\Core\Helpers\HTML\Tag;
+namespace Sea\Helpers\Form;
+use Sea\Components\Security;
+use Sea\Components\Routing\Request;
+use Sea\Helpers\HTML\Tag;
 
 class Form extends Tag {
 	static $tagName = 'form';

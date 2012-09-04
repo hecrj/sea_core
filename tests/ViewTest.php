@@ -1,6 +1,6 @@
 <?php
 
-namespace Sea\Core;
+namespace Sea;
 
 
 

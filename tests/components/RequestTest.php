@@ -1,6 +1,6 @@
 <?php
 
-namespace Sea\Core\Components;
+namespace Sea\Components;
 
 /**
  * Test class for Request.

@@ -1,7 +1,7 @@
 <?php
 
-namespace Sea\Core\Helpers;
-use Sea\Core\Components\Routing\Generators\URLGeneratorInterface;
+namespace Sea\Helpers;
+use Sea\Components\Routing\Generators\URLGeneratorInterface;
 
 class URLGenerator implements URLGeneratorInterface
 {

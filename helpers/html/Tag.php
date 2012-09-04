@@ -1,6 +1,6 @@
 <?php
 
-namespace Sea\Core\Helpers\HTML;
+namespace Sea\Helpers\HTML;
 
 abstract class Tag {
 	static $tagName;

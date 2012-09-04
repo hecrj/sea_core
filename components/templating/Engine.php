@@ -1,8 +1,8 @@
 <?php
 
-namespace Sea\Core\Components\Templating;
-use Sea\Core\Components\DynamicInjector;
-use Sea\Core\Controller;
+namespace Sea\Components\Templating;
+use Sea\Components\DynamicInjector;
+use Sea\Controller;
 
 class Engine
 {	

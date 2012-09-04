@@ -1,7 +1,7 @@
 <?php
 
-namespace Sea\Core;
-use Sea\Core\Components\Routing\Request;
+namespace Sea;
+use Sea\Components\Routing\Request;
 
 class Model extends \ActiveRecord\Model
 {

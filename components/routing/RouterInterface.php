@@ -1,7 +1,7 @@
 <?php
 
-namespace Sea\Core\Components\Routing;
-use Sea\Core\Components\Routing\Routes\RouteCollectionInterface;
+namespace Sea\Components\Routing;
+use Sea\Components\Routing\Routes\RouteCollectionInterface;
 
 interface RouterInterface
 {

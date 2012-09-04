@@ -1,8 +1,8 @@
 <?php
 
-namespace Sea\Core;
-use Sea\App\Components\ComponentInjector;
-use Sea\Core\Components\Routing\Request;
+namespace Sea;
+use App\Components\ComponentInjector;
+use Sea\Components\Routing\Request;
 /**
  * Application class handles every request
  */

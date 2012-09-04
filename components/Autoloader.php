@@ -1,8 +1,8 @@
 <?php
 
-namespace Sea\Core\Components;
+namespace Sea\Components;
 
-require_once(\Sea\DIR . 'core/components/AutoloaderInterface.php');
+require_once(__DIR__ . '/AutoloaderInterface.php');
 
 # Autoloader class
 class Autoloader implements AutoloaderInterface
@@ -10,7 +10,8 @@ class Autoloader implements AutoloaderInterface
 	private $namespaces = array();
 	
 	public function __construct()
-	{}
+	{
+	}
 	
 	public function register()
 	{
@@ -24,11 +25,7 @@ class Autoloader implements AutoloaderInterface
 			$namespaces = explode('\\', $name);
 			$class_name = array_pop($namespaces);
 			
-			if($namespaces[0] == 'Sea')
-			{
-				array_shift($namespaces);
-			}
-			else if(isset($this->namespaces[$namespaces[0]]))
+			if(isset($this->namespaces[$namespaces[0]]))
 			{
 				$namespaces[0] = $this->namespaces[$namespaces[0]];
 			}

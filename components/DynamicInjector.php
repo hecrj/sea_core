@@ -1,6 +1,6 @@
 <?php
 
-namespace Sea\Core\Components;
+namespace Sea\Components;
 
 abstract class DynamicInjector
 {

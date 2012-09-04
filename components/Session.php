@@ -1,7 +1,7 @@
 <?php
 
-namespace Sea\Core\Components;
-use Sea\Core\Components\Routing\Request;
+namespace Sea\Components;
+use Sea\Components\Routing\Request;
 
 ### Session component
 class Session

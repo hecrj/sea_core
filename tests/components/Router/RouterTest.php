@@ -1,8 +1,8 @@
 <?php
 
-namespace Sea\Core\Components\Routing;
+namespace Sea\Components\Routing;
 
-use Sea\Core\Components\Request;
+use Sea\Components\Request;
 
 /**
  * Test class for Router.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Sea\Core\Helpers\Form\Fields;
+namespace Sea\Helpers\Form\Fields;
 
 class Select extends Field {
 	static $tagName = 'select';

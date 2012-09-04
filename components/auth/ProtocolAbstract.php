@@ -1,8 +1,8 @@
 <?php
 
-namespace Sea\Core\Components\Auth;
-use Sea\Core\Components\Session;
-use Sea\Core\Components\Cookie;
+namespace Sea\Components\Auth;
+use Sea\Components\Session;
+use Sea\Components\Cookie;
 
 abstract class ProtocolAbstract
 {
