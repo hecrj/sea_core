@@ -103,7 +103,7 @@ abstract class Controller {
 			
 			$request = $this->get('request');
 			
-			$request->redirectTo(Components\Auth\URI_LOGIN . '/' . base64_encode('/'.$request->getPath()));
+			$request->redirectTo(Components\Auth\URI_LOGIN . '/' . base64_encode($request->getPath()));
 		}
 	}
 	
