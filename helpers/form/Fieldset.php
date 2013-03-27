@@ -78,7 +78,7 @@ class Fieldset extends Tag {
 		$field->set('value', htmlspecialchars($this->model->$id));
 		
 		if($this->posted)
-			$field->error($this->model->errors->on($id));
+			$field->setErrors($this->model->errors->on($id));
 		
 		$this->fields[] = $field;
 		

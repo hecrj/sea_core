@@ -5,6 +5,7 @@ use Sea\Helpers\HTML\Tag;
 
 abstract class Field extends Tag {
 	private $label;
+	private $errors;
 	private $status;
 	private $helps = array();
 	
@@ -16,8 +17,9 @@ abstract class Field extends Tag {
 		return $this->label;
 	}
 	
-	public function error($error) {
-		$this->status = $error ? 'error' : 'success';
+	public function setErrors($errors) {
+		$this->errors = $errors;
+		$this->status = $errors ? 'error' : 'success';
 		
 		return $this;
 	}
@@ -28,6 +30,11 @@ abstract class Field extends Tag {
 	
 	public function getStatus() {
 		return $this->status;
+	}
+
+	public function getErrors()
+	{
+		return $this->errors;
 	}
 	
 	public function help($help, $type = 'help-block') {
