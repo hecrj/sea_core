@@ -12,26 +12,26 @@ class Application
 	{
 	}
 
- 	public function respond(Request $request, Array $routes)
+ 	public function respond(Request $request, $routesPath)
  	{
  		ob_start();
 
  		try
 		{
-			$injector = new ComponentInjector();
-			$injector->set('request', $request);
+			$components = new ComponentInjector();
+			$components->set('request', $request);
 
-			$router = $injector->get('router');
-			$router->setRoutes($routes);
+			$router = $components->get('router');
+			$router->setRoutesFrom($routesPath, $components);
 
 			$context = $router->getContext($request);
-			$injector->set('context', $context);
+			$components->set('context', $context);
 
 			$controller = $context->getController();
-			$controller->setInjector($injector);
+			$controller->setInjector($components);
 			$controller->init($context->getActionName(), $context->getArguments());
 
-			$templating = $injector->get('templating');
+			$templating = $components->get('templating');
 			$templating->render($controller->getView(), $controller->getData());
 		}
 		
@@ -39,7 +39,7 @@ class Application
 		{
 			ob_clean();
 
-			$this->handleException($e, $injector);
+			$this->handleException($e, $components);
 		}
 
 		ob_end_flush();

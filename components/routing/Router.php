@@ -3,6 +3,7 @@
 namespace Sea\Components\Routing;
 use Sea\Components\Routing\Resolvers\ResolverCollectionInterface;
 use Sea\Components\Routing\Routes\RouteCollectionInterface;
+use Sea\Components\DynamicInjector;
 
 class Router implements RouterInterface
 {
@@ -31,6 +32,15 @@ class Router implements RouterInterface
 	{
 		foreach($routes as $subdomain => $collection)
 			$this->addRoutes($subdomain, $collection);
+	}
+
+	public function setRoutesFrom($routesPath, DynamicInjector $components)
+	{
+		if($components->has('auth'))
+			$user = $components->get('auth')->getUser();
+
+		$routes = require(\Sea\DIR . $routesPath);
+		$this->setRoutes($routes);
 	}
 	
 	private function getSubdomainRoutes($subdomain)
